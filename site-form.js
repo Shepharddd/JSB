@@ -10,12 +10,12 @@ const msalConfig = {
 const msalInstance = new msal.PublicClientApplication(msalConfig);
 
 document.getElementById("loginBtn").onclick = async () => {
-  console.log("err");
   try {
     const result = await msalInstance.loginPopup({ scopes: ["Files.ReadWrite"] });
+    console.log(result)
     document.getElementById("loginStatus").innerText = `Logged in as ${result.account.username}`;
   } catch (err) {
-    console.error(err);
+    console.error("[Sign In Error]: ",err);
   }
 };
 
