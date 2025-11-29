@@ -9,6 +9,31 @@ const msalConfig = {
 
 const msalInstance = new msal.PublicClientApplication(msalConfig);
 
+msalInstance.handleRedirectPromise().then(async result => {
+
+  if (result) {
+    console.log("Logged in:", result.account.username);
+    return;
+  }
+
+  const accounts = msalInstance.getAllAccounts();
+
+  if (accounts.length > 0) {
+    const token = await msalInstance.acquireTokenSilent({
+      scopes: ["User.Read"],
+      account: accounts[0],
+    });
+    console.log("Silent token:", token.accessToken);
+    return;
+  }
+
+  msalInstance.loginRedirect({
+    scopes: ["User.Read"]
+  });
+
+});
+
+
 document.getElementById("loginBtn").onclick = async () => {
   try {
     const result = await msalInstance.loginPopup({ scopes: ["Files.ReadWrite"] });
