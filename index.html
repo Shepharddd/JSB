@@ -1,75 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Daily Site Log</title>
-<link rel="stylesheet" href="site-form.css" />
-</head>
-<body>
-<p id="loginStatus"></p>
-<div class="two-col">
-<div class="section">
-<h2>General Information</h2>
-<label>Picture:</label>
-<input type="file" accept="image/*" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Site Log</title>
+    <link rel="stylesheet" href="site-form.css" />
+  </head>
+  <body>
+    <!-- <p id="loginStatus"></p> -->
+    <div class="section">
+      
+        <div class="two-col">
+
+        <img src="GetImage.png" alt="Picture" style="max-width: 50%; height: auto;" />
+
+        <div class="input-container">
+
+          <div class="input-row">
+            <label>Name:</label>
+            <select id="nameInput">
+              <option value="">Select name...</option>
+              <option value="James Samuels">James Samuels</option>
+            </select>
+          </div>
+  
+          <div class="input-row">
+            <label>Site:</label>
+            <select id="siteInput">
+              <option value="">Select site...</option>
+              <option value="Sydenham">Sydenham</option>
+            </select>
+          </div>
+  
+          <div class="input-row">
+            <label>Weather:</label>
+            <input id="weatherInput" type="text" placeholder="Sunny · 29°C" />
+          </div>
+  
+          <div class="input-row">
+            <label>Date:</label>
+            <input id="dateInput" type="date" />
+          </div>
+        </div>
+      </div>
 
 
-<label>Name:</label>
-<input id="nameInput" type="text" placeholder="James Samuels" />
+      <div class="notes-container">
+        <textarea id="notesInput" rows="5" placeholder="Describe the works completed today..."></textarea>
+        <!-- <button class="submit-btn" onclick="submitForm()">Submit Form</button> -->
+      </div>
 
 
-<label>Site:</label>
-<input id="siteInput" type="text" placeholder="Sydenham" />
+    </div>
 
 
-<label>Weather:</label>
-<input id="weatherInput" type="text" placeholder="Sunny · 29°C" />
+    <div class="section">
+      <div class="section-header">
+        <h2>Employee Register</h2>
+        <button class="add-btn" onclick="addEmployeeRow()">Add</button>
+      </div>
+      <table id="employeeTable">
+        <tr>
+          <th>Name</th>
+          <th>Time In</th>
+          <th>Time Out</th>
+          <th>Tasks</th>
+          <th>Delete</th>
+        </tr>
+      </table>
+      <!-- <button class="add-btn" onclick="addEmployeeRow()">Add Employee</button> -->
+    </div>
 
 
-<label>Date:</label>
-<input id="dateInput" type="date" />
-</div>
+    <div class="section">
+      <div class="section-header">
+        <h2>Subcontractor Register</h2>
+        <button class="add-btn" onclick="addSubRow()">Add</button>
+      </div>
+      <table id="subTable">
+        <tr>
+          <th>Name</th>
+          <th>Time In</th>
+          <th>Time Out</th>
+          <th>Tasks</th>
+          <th>Delete</th>
+        </tr>
+      </table>
+    </div>
 
+    <div class="section">
+      <div class="section-header">
+        <h2>Plant/Equipment Register</h2>
+        <button class="add-btn" onclick="addPlantRow()">Add</button>
+      </div>
+      <table id="plantTable">
+        <tr>
+          <!-- <th>Has Used</th> -->
+          <th>Name</th>
+          <th>Tasks</th>
+          <th>Delete</th>
+        </tr>
+      </table>
+    </div>
 
-<div class="section">
-<h2>Daily Notes / Work Completed</h2>
-<textarea id="notesInput" rows="5" placeholder="Describe the works completed today..."></textarea>
-</div>
-</div>
+    <div class="section">
+      <button class="submit-btn" onclick="submitForm()">Submit</button>
+    </div>
 
-
-<div class="section">
-<h2>Employee Register</h2>
-<table id="employeeTable">
-<tr>
-<th>Name</th>
-<th>Time In</th>
-<th>Time Out</th>
-<th>Description of Works</th>
-</tr>
-</table>
-<button class="add-btn" onclick="addEmployeeRow()">Add Employee</button>
-</div>
-
-
-<div class="section">
-<h2>Subcontractor Register</h2>
-<table id="subTable">
-<tr>
-<th>Name</th>
-<th>Time In</th>
-<th>Time Out</th>
-<th>Description of Works</th>
-</tr>
-</table>
-<button class="add-btn" onclick="addSubRow()">Add Subcontractor</button>
-</div>
-
-
-<button class="submit-btn" onclick="submitForm()">Submit Form</button>
-
-<script src="https://alcdn.msauth.net/browser/2.32.2/js/msal-browser.min.js"></script>
-<script src="site-form.js"></script>
-</body>
+    <script src="https://alcdn.msauth.net/browser/2.32.2/js/msal-browser.min.js"></script>
+    <script src="site-form.js"></script>
+  </body>
 </html>
