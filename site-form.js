@@ -26,7 +26,8 @@ async function getAccessToken() {
 }
 
 async function getAccount() {
-  msalInstance.handleRedirectPromise().then(async result => {
+  try {
+    const result = await msalInstance.handleRedirectPromise();
   
     if (result) {
       console.log("Logged in:", result.account.username);
@@ -40,8 +41,13 @@ async function getAccount() {
     msalInstance.loginRedirect({
       scopes: ["User.Read"]
     });
+  } catch (error) {
+    console.log(error)
+  }
+  // msalInstance.handleRedirectPromise().then(async result => {
   
-  }).catch((error) => console.log(error));
+  
+  // }).catch((error) => console.log(error));
 }
 
 async function getCompanyData(){
