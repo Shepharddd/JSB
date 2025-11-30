@@ -8,15 +8,7 @@ const msalConfig = {
 };
 
 const msalInstance = new msal.PublicClientApplication(msalConfig);
-
-msalInstance.handleRedirectPromise().then(async result => {
-
-  if (result) {
-    console.log("Logged in:", result.account.username);
-    return;
-  }
-
-  const accounts = msalInstance.getAllAccounts();
+const accounts = msalInstance.getAllAccounts();
 
   if (accounts.length > 0) {
     const token = await msalInstance.acquireTokenSilent({
@@ -25,13 +17,34 @@ msalInstance.handleRedirectPromise().then(async result => {
     });
     console.log("Silent token:", token.accessToken);
     return;
+  } else {
+    console.log("No users Found")
   }
 
-  msalInstance.loginRedirect({
-    scopes: ["User.Read"]
-  });
 
-});
+// msalInstance.handleRedirectPromise().then(async result => {
+
+//   if (result) {
+//     console.log("Logged in:", result.account.username);
+//     return;
+//   }
+
+//   const accounts = msalInstance.getAllAccounts();
+
+//   if (accounts.length > 0) {
+//     const token = await msalInstance.acquireTokenSilent({
+//       scopes: ["User.Read"],
+//       account: accounts[0],
+//     });
+//     console.log("Silent token:", token.accessToken);
+//     return;
+//   }
+
+//   msalInstance.loginRedirect({
+//     scopes: ["User.Read"]
+//   });
+
+// });
 
 
 document.getElementById("loginBtn").onclick = async () => {
