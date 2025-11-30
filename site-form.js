@@ -3,7 +3,8 @@ const msalInstance = new msal.PublicClientApplication({
   auth: {
     clientId: "911b26da-32a3-4e6f-b3a7-6ec57e5063a2",
     authority: "https://login.microsoftonline.com/common",
-    redirectUri: window.location.origin,
+    // redirectUri: window.location.origin,
+    redirectUri: "https://shepharddd.github.io/JSB"
 }});
 
 function setToday() {
@@ -36,9 +37,9 @@ async function getAccount() {
     ACCOUNT = accounts[0]
     console.log(accounts[0])
     
-    msalInstance.loginRedirect({
-      scopes: ["User.Read"]
-    });
+    // msalInstance.loginRedirect({
+    //   scopes: ["User.Read"]
+    // });
   
   }).catch((error) => console.log(error));
 }
