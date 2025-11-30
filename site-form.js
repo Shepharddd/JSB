@@ -21,7 +21,8 @@ async function getAccessToken() {
     scopes: ["User.Read"],
     account: ACCOUNT,
   });
-  
+
+  console.log(token.accessToken)
   return token.accessToken;
 }
 
@@ -31,6 +32,7 @@ async function getAccount() {
   
     if (result) {
       console.log("Logged in:", result.account.username);
+      getCompanyData();
       return;
     }
   
@@ -85,7 +87,6 @@ async function init() {
   setToday();
   getWeatherDescription();
   await getAccount();
-  await getCompanyData();
 
 }
 
