@@ -1,16 +1,30 @@
 // MSAL Login
-const msalConfig = {
+const msalInstance = new msal.PublicClientApplication({
   auth: {
     clientId: "911b26da-32a3-4e6f-b3a7-6ec57e5063a2",
     authority: "https://login.microsoftonline.com/common",
     redirectUri: window.location.origin,
-  }
-};
+}});
 
-async function init() {
-  const msalInstance = new msal.PublicClientApplication(msalConfig);
-  // const accounts = msalInstance.getAllAccounts();
+function setToday() {
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("dateInput").value = today;
+}
+
+let ACCOUNT = null;
+
+async function getAccessToken() {
+  if (!ACCOUNT) return;
+
+  const token = await msalInstance.acquireTokenSilent({
+    scopes: ["User.Read"],
+    account: ACCOUNT,
+  });
   
+  return token.accessToken;
+}
+
+async function getAccount() {
   msalInstance.handleRedirectPromise().then(async result => {
   
     if (result) {
@@ -19,38 +33,53 @@ async function init() {
     }
   
     const accounts = msalInstance.getAllAccounts();
-  
-    if (accounts.length > 0) {
-      const token = await msalInstance.acquireTokenSilent({
-        scopes: ["User.Read"],
-        account: accounts[0],
-      });
-      console.log("Silent token:", token.accessToken);
-      return;
-    }
-  
+    ACCOUNT = accounts[0]
+    console.log(accounts[0])
+    
     msalInstance.loginRedirect({
       scopes: ["User.Read"]
     });
   
-  });
-    // if (accounts.length > 0) {
-    //   const token = await msalInstance.acquireTokenSilent({
-    //     scopes: ["User.Read"],
-    //     account: accounts[0],
-    //   });
-    //   console.log("Silent token:", token.accessToken);
-    //   return;
-    // } else {
-    //   console.log("No users Found")
-    // }
+  }).catch((error) => console.log(error));
 }
 
-// init();
+async function getCompanyData(){
+  const token = await getAccessToken();
+  const url = 'https://default68237f8abf3c425bb92b9518c6d4bf.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1d22896883294970a2ca02e4d4ce2a8b/triggers/manual/paths/invoke?api-version=1';
+  try {
+        const response = await fetch(url, {
+          method: 'POST', // Power Automate manual trigger usually expects POST
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+          },
+          // Optional: only include if your flow expects input JSON
+          body: JSON.stringify({
+            filter: 'optionalFilterValue'
+          })
+        });
 
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
+        const data = await response.json();
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
 
+      } catch (error) {
+        document.getElementById('output').textContent = 'Error: ' + error;
+      }
 
+}
+
+function init() {
+  setToday();
+  getAccount();
+  getWeatherDescription();
+
+}
+
+init();;
 
 document.getElementById("loginBtn").onclick = async () => {
   try {
@@ -242,38 +271,6 @@ const siteCoordinates = {
   // Add more sites as needed
 };
 
-// Weather condition descriptions
-const weatherDescriptions = {
-  0: "Clear",
-  1: "Mainly Clear",
-  2: "Partly Cloudy",
-  3: "Overcast",
-  45: "Foggy",
-  48: "Depositing Rime Fog",
-  51: "Light Drizzle",
-  53: "Moderate Drizzle",
-  55: "Dense Drizzle",
-  56: "Light Freezing Drizzle",
-  57: "Dense Freezing Drizzle",
-  61: "Slight Rain",
-  63: "Moderate Rain",
-  65: "Heavy Rain",
-  66: "Light Freezing Rain",
-  67: "Heavy Freezing Rain",
-  71: "Slight Snow",
-  73: "Moderate Snow",
-  75: "Heavy Snow",
-  77: "Snow Grains",
-  80: "Slight Rain Showers",
-  81: "Moderate Rain Showers",
-  82: "Violent Rain Showers",
-  85: "Slight Snow Showers",
-  86: "Heavy Snow Showers",
-  95: "Thunderstorm",
-  96: "Thunderstorm with Hail",
-  99: "Thunderstorm with Heavy Hail"
-};
-
 // Fetch and update weather
 async function updateWeather() {
   const siteInput = document.getElementById("siteInput");
@@ -321,6 +318,57 @@ async function updateWeather() {
   }
 }
 
+async function getWeatherDescription() {
+  const weatherInput = document.getElementById("weatherInput");
+  if (!weatherInput) return;
+  
+  const lat = -37.8167;
+  const lon = 145.0000;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`;
+  
+  const res = await fetch(url);
+  const data = await res.json();
+  
+  const code = data.current.weather_code;
+  const temp = data.current.temperature_2m;
+
+  // Weather condition descriptions
+  const weatherDescriptions = {
+    0: "Clear",
+    1: "Mainly Clear",
+    2: "Partly Cloudy",
+    3: "Overcast",
+    45: "Foggy",
+    48: "Depositing Rime Fog",
+    51: "Light Drizzle",
+    53: "Moderate Drizzle",
+    55: "Dense Drizzle",
+    56: "Light Freezing Drizzle",
+    57: "Dense Freezing Drizzle",
+    61: "Slight Rain",
+    63: "Moderate Rain",
+    65: "Heavy Rain",
+    66: "Light Freezing Rain",
+    67: "Heavy Freezing Rain",
+    71: "Slight Snow",
+    73: "Moderate Snow",
+    75: "Heavy Snow",
+    77: "Snow Grains",
+    80: "Slight Rain Showers",
+    81: "Moderate Rain Showers",
+    82: "Violent Rain Showers",
+    85: "Slight Snow Showers",
+    86: "Heavy Snow Showers",
+    95: "Thunderstorm",
+    96: "Thunderstorm with Hail",
+    99: "Thunderstorm with Heavy Hail"
+  };
+  
+  const description = weatherDescriptions[Number(code)] || "Unknown weather";
+  weatherInput.value = `${description} · ${temp}°C`;
+}
+
+
 async function fetchWeatherByCoordinates(latitude, longitude) {
   const weatherInput = document.getElementById("weatherInput");
   if (!weatherInput) return;
@@ -352,12 +400,12 @@ async function fetchWeatherByCoordinates(latitude, longitude) {
 
 // Update weather when page loads and when site changes
 document.addEventListener("DOMContentLoaded", () => {
-  updateWeather();
+  // updateWeather();
   
-  const siteInput = document.getElementById("siteInput");
-  if (siteInput) {
-    siteInput.addEventListener("change", updateWeather);
-  }
+  // const siteInput = document.getElementById("siteInput");
+  // if (siteInput) {
+  //   siteInput.addEventListener("change", updateWeather);
+  // }
   
   // Make existing time cells clickable
   const employeeRows = document.querySelectorAll("#employeeTable tr");
@@ -374,3 +422,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+

@@ -6,11 +6,15 @@ body {
   background: #f4f4f4;
 }
 .section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: white;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
 }
 .two-col {
   display: flex;
@@ -30,6 +34,7 @@ body {
   gap: 20px;
   align-items: flex-start;
   margin-top: 20px;
+  width: 100%;
 }
 .notes-container textarea {
   flex: 1;
@@ -68,6 +73,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 10px;
+  width: 100%;
 }
 .section-header h2 {
   margin-top: 0;
@@ -287,7 +293,7 @@ input, textarea {
 }
 .add-btn:hover, .submit-btn:hover {
   background: #0056b3;
-  transform: translateY(-1px);
+  transform: translateY(1px);
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .submit-btn {
@@ -295,7 +301,7 @@ input, textarea {
   padding: 12px 24px;
   font-size: 16px;
   width: 40%;
-  margin-top: 20px;
+  /* margin-top: 20px; */
 }
 .submit-btn:hover {
   background: #002512;
