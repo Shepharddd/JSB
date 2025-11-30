@@ -48,35 +48,38 @@ async function getCompanyData(){
   const token = await getAccessToken();
   const url = 'https://default68237f8abf3c425bb92b9518c6d4bf.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1d22896883294970a2ca02e4d4ce2a8b/triggers/manual/paths/invoke?api-version=1';
   try {
-        const response = await fetch(url, {
-          method: 'POST', // Power Automate manual trigger usually expects POST
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token && { 'Authorization': `Bearer ${token}` })
-          },
-          // Optional: only include if your flow expects input JSON
-          body: JSON.stringify({
-            filter: 'optionalFilterValue'
-          })
-        });
+    const response = await fetch(url, {
+      method: 'POST', // Power Automate manual trigger usually expects POST
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      },
+      // Optional: only include if your flow expects input JSON
+      body: JSON.stringify({
+        filter: 'optionalFilterValue'
+      })
+    });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-        const data = await response.json();
-        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
-
-      } catch (error) {
-        document.getElementById('output').textContent = 'Error: ' + error;
-      }
+    const data = await response.json();
+    // document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    console.log(data)
+    
+  } catch (error) {
+    console.log(error)
+    // document.getElementById('output').textContent = 'Error: ' + error;
+  }
 
 }
 
-function init() {
+async function init() {
   setToday();
-  getAccount();
   getWeatherDescription();
+  await getAccount();
+  await getCompanyData();
 
 }
 
