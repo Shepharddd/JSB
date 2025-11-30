@@ -37,9 +37,9 @@ async function getAccount() {
     ACCOUNT = accounts[0]
     console.log(accounts[0])
     
-    // msalInstance.loginRedirect({
-    //   scopes: ["User.Read"]
-    // });
+    msalInstance.loginRedirect({
+      scopes: ["User.Read"]
+    });
   
   }).catch((error) => console.log(error));
 }
@@ -80,7 +80,7 @@ function init() {
 
 }
 
-init();;
+init();
 
 document.getElementById("loginBtn").onclick = async () => {
   try {
