@@ -142,10 +142,11 @@ async function getCompanyData(){
         }
 
         const data = await response.json();
-        const [plant_items, employees, sites] = extractCategories(data)
+        const [plant_items, employees, sites, foremen] = extractCategories(data)
 
         console.log("Table data:", plant_items); // data.value contains the rows
         addSites(sites)
+        addForemen(foremen)
         return data.value;
     } catch (err) {
         console.error(err);
