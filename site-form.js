@@ -29,7 +29,7 @@ async function getAccessToken() {
   if (!ACCOUNT) return;
 
   const token = await msalInstance.acquireTokenSilent({
-    scopes: ["User.Read"],
+    scopes: ["https://logic.azure.com/.default"],
     account: ACCOUNT,
   });
 
