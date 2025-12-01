@@ -55,38 +55,38 @@ async function getAccessToken() {
 
 
 async function getAccount() {
+  console.log("Getting User Account");
+
   try {
-    console.log("Getting User Account")
+    // Step 1 — see if this load is returning from redirect login
+    const result = await msalInstance.handleRedirectPromise();
 
-    const result = await msalInstance.handleRedirectPromise()
-      .catch((error) => console.log("Error: ", error));
-  
     if (result) {
-      console.log("Logged in:", result.account.username);
-
-      const accounts = msalInstance.getAllAccounts();
-      if (accounts.length > 0) {
-        
-        setAccount(accounts[0])
-
-        // getCompanyData();
-          // // User is logged in
-          // const activeAccount = accounts[0]; // You can pick the first one or manage multiple accounts
-          // console.log("User is logged in:", activeAccount.username);
-      } else {
-          // No user is logged in
-          console.log("No user is logged in");
-          msalInstance.loginRedirect({
-            scopes: ["User.Read"]
-          });
-      }
+      console.log("Redirect login detected for:", result.account.username);
+      setAccount(result.account);
       return;
     }
-  
+
+    // Step 2 — no redirect result → check if user already signed in
+    const accounts = msalInstance.getAllAccounts();
+
+    if (accounts.length > 0) {
+      console.log("User already logged in:", accounts[0].username);
+      setAccount(accounts[0]);
+      return;
+    }
+
+    // Step 3 — no user signed in → start login
+    console.log("No user logged in → redirecting…");
+    msalInstance.loginRedirect({
+      scopes: ["User.Read"]
+    });
+
   } catch (error) {
-    console.log("Error: ", error)
+    console.error("getAccount Error:", error);
   }
 }
+
 
 async function getCompanyData(){
   const token = await getAccessToken();
