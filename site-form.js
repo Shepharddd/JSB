@@ -108,7 +108,7 @@ function extractCategories(rawData) {
 }
 
 async function init() {
-  // getAccount();
+  getAccount();
   setToday();
   getWeatherDescription();
 }
