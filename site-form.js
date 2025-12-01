@@ -79,7 +79,7 @@ async function getCompanyData(){
         console.log("Table data:", plant_items); // data.value contains the rows
         addSites(sites)
         addForemen(foremen)
-        addEmployees(employees)
+        addEmployees([employees, foremen])
         addPlant(plant_items)
         return data.value;
     } catch (err) {
