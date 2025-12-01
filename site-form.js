@@ -2,7 +2,7 @@
 const msalInstance = new msal.PublicClientApplication({
   auth: {
     clientId: "911b26da-32a3-4e6f-b3a7-6ec57e5063a2",
-    authority: "https://login.microsoftonline.com/68237f8a-bf3c-425b-b92b-9518c6d4bf18/oauth2/v2.0/token",
+    authority: "https://login.microsoftonline.com/68237f8a-bf3c-425b-b92b-9518c6d4bf18/",
     // redirectUri: window.location.origin,
     redirectUri: "https://timesheets.jamessamuelsbuilder.com.au/"
   },
