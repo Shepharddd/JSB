@@ -13,8 +13,23 @@ const msalInstance = new msal.PublicClientApplication({
 const tokenRequest = { scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"] };
 
 let sites = []
+let foremen = []
 let employees = []
 let plant = []
+
+function addForemen(data) {
+  foremen = data
+  // Get the select element
+  const siteSelect = document.getElementById("nameInput");
+
+  // Add each site as an option
+  foremen.forEach(foreman => {
+    const option = document.createElement("option");
+    option.value = foreman;
+    option.textContent = foreman;
+    siteSelect.appendChild(option);
+  });
+}
 
 function addSites(data) {
   sites = data
@@ -31,7 +46,7 @@ function addSites(data) {
 }
 
 function addEmployees(data) {
-  sites = data
+  employees = data
   // Get the select element
   const siteSelect = document.getElementById("siteInput");
 
@@ -43,7 +58,6 @@ function addEmployees(data) {
     siteSelect.appendChild(option);
   });
 }
-
 
 function setToday() {
   const today = new Date().toISOString().split("T")[0];
@@ -155,7 +169,7 @@ function extractCategories(rawData) {
     });
 
     // Return arrays in a fixed order: [Plant Items, Employees]
-    return [categories["Plant Items"] || [], categories["Employees"] || [], categories["Sites"] || [] ];
+    return [categories["Plant Items"] || [], categories["Employees"] || [], categories["Sites"] || [], categories["Foremen"] || [] ];
 }
 
 async function init() {
