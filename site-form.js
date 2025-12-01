@@ -119,9 +119,16 @@ async function getCompanyData(){
 
 
         // Path to your Excel file in OneDrive
-        const filePath = "/Data.xlsx"; // change if different path
-        const tableName = "Table13"
-        const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows`;
+        // const filePath = "/Data.xlsx"; // change if different path
+        // const tableName = "Table13"
+
+        const otherUser = "admin@jamessamuelsbuilder.com.au"; // or user ID
+        const fileName = "Data.xlsx";
+        const tableId = "Table13";
+
+        const url = `https://graph.microsoft.com/v1.0/users('${otherUser}')/drive/root:/${fileName}:/workbook/tables('${tableId}')/rows`;
+
+        // const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows`;
 
         const response = await fetch(url, {
             method: "GET",
