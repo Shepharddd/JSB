@@ -365,8 +365,15 @@ async function addRowsToTable(tableName, payload) {
     const filePath = '/Data.xlsx'
     const token = await getAccessToken();
 
+    const otherUser = "admin@jamessamuelsbuilder.com.au"; // or user ID
+    const fileName = "Data.xlsx";
+    const tableId = "Table1";
+
+    const url = `https://graph.microsoft.com/v1.0/users('${otherUser}')/drive/root:/${fileName}:/workbook/tables('${tableId}')/rows/add`;
+
+
     // if (!rows.length) return;
-    const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows/add`;
+    // const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows/add`;
     // const body = { values: rows };
     console.log("Posting Request With Data: ", payload)
     const res = await fetch(url, {
