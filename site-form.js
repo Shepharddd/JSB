@@ -58,14 +58,17 @@ async function getAccount() {
   try {
     console.log("Getting User Account")
 
-    const result = await msalInstance.handleRedirectPromise();
+    const result = await msalInstance.handleRedirectPromise()
+      .catch((error) => console.log("Error: ", error));
   
     if (result) {
       console.log("Logged in:", result.account.username);
 
       const accounts = msalInstance.getAllAccounts();
       if (accounts.length > 0) {
+        
         setAccount(accounts[0])
+
         // getCompanyData();
           // // User is logged in
           // const activeAccount = accounts[0]; // You can pick the first one or manage multiple accounts
