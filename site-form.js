@@ -40,6 +40,7 @@ async function login() {
       console.log("Logged in user:", loginResponse.account.username);
       // hide your popup here if login succeeds
       closePopup();
+      getCompanyData();
     })
     .catch((error) => {
       console.error(error);
