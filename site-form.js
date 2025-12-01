@@ -287,6 +287,7 @@ async function submitForm() {
 // --- Function to add rows to a table ---
 async function addRowsToTable(tableName, rows) {
     const filePath = 'Data.xlsx'
+    const token = await getAccessToken();
 
     if (!rows.length) return;
     const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows/add`;
