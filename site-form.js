@@ -286,7 +286,7 @@ async function submitForm() {
 
 // --- Function to add rows to a table ---
 async function addRowsToTable(tableName, rows) {
-    const filePath = 'Data.xlsx'
+    const filePath = '/Data.xlsx'
     const token = await getAccessToken();
 
     if (!rows.length) return;
