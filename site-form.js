@@ -2,7 +2,7 @@
 const msalInstance = new msal.PublicClientApplication({
   auth: {
     clientId: "911b26da-32a3-4e6f-b3a7-6ec57e5063a2",
-    authority: "https://login.microsoftonline.com/common",
+    authority: "https://login.microsoftonline.com/68237f8a-bf3c-425b-b92b-9518c6d4bf18",
     // redirectUri: window.location.origin,
     redirectUri: "https://timesheets.jamessamuelsbuilder.com.au/"
   },
@@ -84,7 +84,7 @@ async function getCompanyData(){
       method: 'POST', // Power Automate manual trigger usually expects POST
       headers: {
         'Content-Type': 'application/json',
-        ...({ 'Authorization': `Bearer ${token}` })
+        'Authorization': `Bearer ${token}`
       },
       // Optional: only include if your flow expects input JSON
       body: JSON.stringify({
