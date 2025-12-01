@@ -12,6 +12,24 @@ const msalInstance = new msal.PublicClientApplication({
 });
 const tokenRequest = { scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"] };
 
+let sites = []
+let employees = []
+let plant = []
+
+function addSites(data) {
+  sites = data
+  // Get the select element
+  const siteSelect = document.getElementById("siteInput");
+
+  // Add each site as an option
+  sites.forEach(site => {
+    const option = document.createElement("option");
+    option.value = site;
+    option.textContent = site;
+    siteSelect.appendChild(option);
+  });
+}
+
 
 function setToday() {
   const today = new Date().toISOString().split("T")[0];
@@ -96,9 +114,9 @@ async function getCompanyData(){
         }
 
         const data = await response.json();
-        const rows = flattenTableData(data.value)
+        const [plant_items, employees, sites] = flattenTableData(data.value)
 
-        console.log("Table data:", rows); // data.value contains the rows
+        console.log("Table data:", plant_items); // data.value contains the rows
         return data.value;
     } catch (err) {
         console.error(err);
@@ -107,14 +125,22 @@ async function getCompanyData(){
 
 }
 
-function flattenTableData(data) {
-    return data.map(row => {
+function extractCategories(rawData) {
+    const categories = {};
+
+    rawData.value.forEach(row => {
         if (row.values && row.values[0] && row.values[0].length === 2) {
             const [key, value] = row.values[0];
-            return { [key]: value };
+
+            if (!categories[key]) {
+                categories[key] = [];
+            }
+            categories[key].push(value);
         }
-        return {};
     });
+
+    // Return arrays in a fixed order: [Plant Items, Employees]
+    return [categories["Plant Items"] || [], categories["Employees"] || [], categories["Sites"] || [] ];
 }
 
 async function init() {
