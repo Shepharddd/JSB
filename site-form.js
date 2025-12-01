@@ -1,16 +1,4 @@
-// MSAL Login
-const msalInstance = new msal.PublicClientApplication({
-  auth: {
-    clientId: "911b26da-32a3-4e6f-b3a7-6ec57e5063a2",
-    authority: "https://login.microsoftonline.com/68237f8a-bf3c-425b-b92b-9518c6d4bf18/",
-    // redirectUri: window.location.origin,
-    redirectUri: "https://timesheets.jamessamuelsbuilder.com.au/"
-  },
-  system: {
-    navigateToLoginRequestUrl: false
-  }
-});
-const tokenRequest = { scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"] };
+// Auth functions are now in auth.js
 
 let sites = []
 let foremen = []
@@ -59,76 +47,18 @@ function setToday() {
   document.getElementById("dateInput").value = today;
 }
 
-let ACCOUNT = null;
-
-function setAccount(account) {
-  ACCOUNT = account;
-  console.log("Got Account: ", ACCOUNT)
-  getCompanyData();
-}
-
-async function getAccessToken() {
-  console.log("Retreiving Access Token for Account: ", ACCOUNT)
-  if (!ACCOUNT) return;
-
-  const token = await msalInstance.acquireTokenSilent({
-    scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"],
-    account: ACCOUNT,
-  });
-
-  console.log("Got Token: ", token)
-  return token.accessToken;
-}
-
-async function getAccount() {
-  console.log("Getting User Account");
-
-  try {
-    // Step 1 — see if this load is returning from redirect login
-    const result = await msalInstance.handleRedirectPromise();
-
-    if (result) {
-      console.log("Redirect login detected for:", result.account.username);
-      setAccount(result.account);
-      return;
-    }
-
-    // Step 2 — no redirect result → check if user already signed in
-    const accounts = msalInstance.getAllAccounts();
-
-    if (accounts.length > 0) {
-      console.log("User already logged in:", accounts[0].username);
-      setAccount(accounts[0]);
-      return;
-    }
-
-    // Step 3 — no user signed in → start login
-    console.log("No user logged in → redirecting…");
-    msalInstance.loginRedirect(tokenRequest);
-
-  } catch (error) {
-    console.error("getAccount Error:", error);
-  }
-}
-
+// Auth functions (getAccount, getAccessToken, setAccount) are now in auth.js
 async function getCompanyData(){
   try {
         // Get access token
         const token = await getAccessToken();
         if (!token) throw new Error("No access token available");
 
-
-        // Path to your Excel file in OneDrive
-        // const filePath = "/Data.xlsx"; // change if different path
-        // const tableName = "Table13"
-
         const otherUser = "admin@jamessamuelsbuilder.com.au"; // or user ID
         const fileName = "Data.xlsx";
         const tableId = "Table13";
 
         const url = `https://graph.microsoft.com/v1.0/users('${otherUser}')/drive/root:/${fileName}:/workbook/tables('${tableId}')/rows`;
-
-        // const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows`;
 
         const response = await fetch(url, {
             method: "GET",
@@ -181,21 +111,9 @@ async function init() {
   getAccount();
   setToday();
   getWeatherDescription();
-  // login();
-
 }
 
 init();
-
-document.getElementById("loginBtn").onclick = async () => {
-  try {
-    const result = await msalInstance.loginPopup({ scopes: ["Files.ReadWrite"] });
-    console.log(result)
-    document.getElementById("loginStatus").innerText = `Logged in as ${result.account.username}`;
-  } catch (err) {
-    console.error("[Sign In Error]: ",err);
-  }
-};
 
 function addEmployeeRow() {
   const table = document.getElementById("employeeTable");
@@ -211,19 +129,21 @@ function addEmployeeRow() {
     <td>
       <select>${optionsHtml}</select>
     </td>
-    <td>
+    <td class="time-cell" onclick="openTimeModal(this, 'Time In')">
       <span class="time-display">07:00</span>
-      <input type="time" value="07:00" style="display: none;" />
+      <input type="hidden" class="time-input" value="07:00" />
     </td>
-    <td>
+    <td class="time-cell" onclick="openTimeModal(this, 'Time Out')">
       <span class="time-display">15:30</span>
-      <input type="time" value="15:30" style="display: none;" />
+      <input type="hidden" class="time-input" value="15:30" />
     </td>
-    <td><input type="text" placeholder="Work description" /></td>
+    <td class="work-desc-cell" onclick="openWorkDescModal(this)">
+      <span class="work-desc-display empty">Click to add description</span>
+      <input type="hidden" class="work-desc-input" value="" />
+    </td>
     <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
   `;
 
-  makeTimeCellsClickable(row);
 }
 
 function addSubRow() {
@@ -231,12 +151,20 @@ function addSubRow() {
   const row = table.insertRow();
   row.innerHTML = `
     <td><input type="text" placeholder="Name" /></td>
-    <td><span class="time-display">07:00</span><input type="time" value="07:00" style="display: none;" /></td>
-    <td><span class="time-display">15:30</span><input type="time" value="15:30" style="display: none;" /></td>
-    <td><input type="text" placeholder="Work description" /></td>
+    <td class="time-cell" onclick="openTimeModal(this, 'Time In')">
+      <span class="time-display">07:00</span>
+      <input type="hidden" class="time-input" value="07:00" />
+    </td>
+    <td class="time-cell" onclick="openTimeModal(this, 'Time Out')">
+      <span class="time-display">15:30</span>
+      <input type="hidden" class="time-input" value="15:30" />
+    </td>
+    <td class="work-desc-cell" onclick="openWorkDescModal(this)">
+      <span class="work-desc-display empty">Click to add description</span>
+      <input type="hidden" class="work-desc-input" value="" />
+    </td>
     <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
   `;
-  makeTimeCellsClickable(row);
 }
 
 function addPlantRow() {
@@ -253,7 +181,10 @@ function addPlantRow() {
     <td>
       <select>${optionsHtml}</select>
     </td>
-    <td><input type="text" placeholder="Work description" /></td>
+    <td class="work-desc-cell" onclick="openWorkDescModal(this)">
+      <span class="work-desc-display empty">Click to add description</span>
+      <input type="hidden" class="work-desc-input" value="" />
+    </td>
     <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
   `;
 }
@@ -264,38 +195,119 @@ function deleteRow(button) {
   row.remove();
 }
 
-// Make time cells clickable to open time input
-function makeTimeCellsClickable(row) {
-  const timeCells = [row.children[1], row.children[2]]; // Time In and Time Out columns
-  timeCells.forEach(cell => {
-    if (cell) {
-      const timeInput = cell.querySelector('input[type="time"]');
-      const timeDisplay = cell.querySelector('.time-display');
-      if (timeInput && timeDisplay) {
-        cell.style.cursor = 'pointer';
-        
-        // Update display when time changes
-        timeInput.addEventListener('change', () => {
-          timeDisplay.textContent = timeInput.value || '';
-        });
-        
-        // Update display on input (for real-time updates)
-        timeInput.addEventListener('input', () => {
-          timeDisplay.textContent = timeInput.value || '';
-        });
-        
-        cell.addEventListener('click', (e) => {
-          // Don't trigger if clicking directly on the input
-          if (e.target !== timeInput) {
-            timeInput.showPicker ? timeInput.showPicker() : timeInput.focus();
-          }
-        });
-      }
-    }
-  });
+// Time Modal Functions
+let currentTimeCell = null;
+
+function openTimeModal(cell, title) {
+  currentTimeCell = cell;
+  const modal = document.getElementById("timeModal");
+  const timeInput = document.getElementById("timeInput");
+  const modalTitle = document.getElementById("timeModalTitle");
+  const hiddenInput = cell.querySelector('.time-input');
+  const display = cell.querySelector('.time-display');
+  
+  // Set modal title
+  modalTitle.textContent = title;
+  
+  // Load existing value
+  timeInput.value = hiddenInput ? hiddenInput.value : '';
+  
+  // Show modal
+  modal.style.display = 'flex';
+  timeInput.focus();
 }
 
+function closeTimeModal() {
+  const modal = document.getElementById("timeModal");
+  modal.style.display = 'none';
+  currentTimeCell = null;
+}
 
+function saveTime() {
+  if (!currentTimeCell) return;
+  
+  const timeInput = document.getElementById("timeInput");
+  const hiddenInput = currentTimeCell.querySelector('.time-input');
+  const display = currentTimeCell.querySelector('.time-display');
+  
+  const value = timeInput.value;
+  
+  // Save to hidden input
+  if (hiddenInput) {
+    hiddenInput.value = value;
+  }
+  
+  // Update display
+  if (display) {
+    display.textContent = value || '--:--';
+  }
+  
+  closeTimeModal();
+}
+
+// Work Description Modal Functions
+let currentWorkDescCell = null;
+
+function openWorkDescModal(cell) {
+  currentWorkDescCell = cell;
+  const modal = document.getElementById("workDescModal");
+  const textarea = document.getElementById("workDescTextarea");
+  const hiddenInput = cell.querySelector('.work-desc-input');
+  const display = cell.querySelector('.work-desc-display');
+  
+  // Load existing value
+  textarea.value = hiddenInput ? hiddenInput.value : '';
+  
+  // Show modal
+  modal.style.display = 'flex';
+  textarea.focus();
+}
+
+function closeWorkDescModal() {
+  const modal = document.getElementById("workDescModal");
+  modal.style.display = 'none';
+  currentWorkDescCell = null;
+}
+
+function saveWorkDescription() {
+  if (!currentWorkDescCell) return;
+  
+  const textarea = document.getElementById("workDescTextarea");
+  const hiddenInput = currentWorkDescCell.querySelector('.work-desc-input');
+  const display = currentWorkDescCell.querySelector('.work-desc-display');
+  
+  const value = textarea.value.trim();
+  
+  // Save to hidden input
+  if (hiddenInput) {
+    hiddenInput.value = value;
+  }
+  
+  // Update display
+  if (display) {
+    if (value) {
+      display.textContent = value.length > 50 ? value.substring(0, 50) + '...' : value;
+      display.classList.remove('empty');
+    } else {
+      display.textContent = 'Click to add description';
+      display.classList.add('empty');
+    }
+  }
+  
+  closeWorkDescModal();
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+  const workDescModal = document.getElementById("workDescModal");
+  const timeModal = document.getElementById("timeModal");
+  if (event.target === workDescModal) {
+    closeWorkDescModal();
+  }
+  if (event.target === timeModal) {
+    closeTimeModal();
+  }
+}
 
 async function submitForm() {
     // --- Main info ---
@@ -312,9 +324,12 @@ async function submitForm() {
         .map(row => {
             const cells = row.children;
             const nameInput = cells[0].querySelector("input") || cells[0].querySelector("select");
-            const timeIn = cells[1].querySelector("input") ? timeToExcelFraction(cells[1].querySelector("input").value) : "";
-            const timeOut = cells[2].querySelector("input") ? timeToExcelFraction(cells[2].querySelector("input").value) : "";
-            const desc = cells[3].querySelector("input") ? cells[3].querySelector("input").value : "";
+            const timeInInput = cells[1].querySelector(".time-input");
+            const timeOutInput = cells[2].querySelector(".time-input");
+            const timeIn = timeInInput ? timeToExcelFraction(timeInInput.value) : "";
+            const timeOut = timeOutInput ? timeToExcelFraction(timeOutInput.value) : "";
+            const descInput = cells[3].querySelector(".work-desc-input");
+            const desc = descInput ? descInput.value : "";
             return [nameInput ? nameInput.value : "", timeIn, timeOut, desc];
         });
 
@@ -332,9 +347,12 @@ async function submitForm() {
         .map(row => {
             const cells = row.children;
             const name = cells[0].querySelector("input") ? cells[0].querySelector("input").value : "";
-            const timeIn = cells[1].querySelector("input") ? timeToExcelFraction(cells[1].querySelector("input").value) : "";
-            const timeOut = cells[2].querySelector("input") ? timeToExcelFraction(cells[2].querySelector("input").value) : "";
-            const desc = cells[3].querySelector("input") ? cells[3].querySelector("input").value : "";
+            const timeInInput = cells[1].querySelector(".time-input");
+            const timeOutInput = cells[2].querySelector(".time-input");
+            const timeIn = timeInInput ? timeToExcelFraction(timeInInput.value) : "";
+            const timeOut = timeOutInput ? timeToExcelFraction(timeOutInput.value) : "";
+            const descInput = cells[3].querySelector(".work-desc-input");
+            const desc = descInput ? descInput.value : "";
             return [name, timeIn, timeOut, desc];
         });
 
@@ -371,10 +389,6 @@ async function addRowsToTable(tableName, payload) {
 
     const url = `https://graph.microsoft.com/v1.0/users('${otherUser}')/drive/root:/${fileName}:/workbook/tables('${tableId}')/rows/add`;
 
-
-    // if (!rows.length) return;
-    // const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows/add`;
-    // const body = { values: rows };
     console.log("Posting Request With Data: ", payload)
     const res = await fetch(url, {
       method: "POST",
@@ -534,27 +548,7 @@ async function fetchWeatherByCoordinates(latitude, longitude) {
 
 // Update weather when page loads and when site changes
 document.addEventListener("DOMContentLoaded", () => {
-  // updateWeather();
-  
-  // const siteInput = document.getElementById("siteInput");
-  // if (siteInput) {
-  //   siteInput.addEventListener("change", updateWeather);
-  // }
-  
-  // Make existing time cells clickable
-  const employeeRows = document.querySelectorAll("#employeeTable tr");
-  employeeRows.forEach(row => {
-    if (row.children.length > 0) {
-      makeTimeCellsClickable(row);
-    }
-  });
-  
-  const subRows = document.querySelectorAll("#subTable tr");
-  subRows.forEach(row => {
-    if (row.children.length > 0) {
-      makeTimeCellsClickable(row);
-    }
-  });
+  // Time cells are now handled via onclick handlers in the HTML
 });
 
 

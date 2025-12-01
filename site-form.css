@@ -55,7 +55,7 @@ body {
 }
 .input-row input,
 .input-row select {
-  width: auto;
+  width: 100%;
   padding: 0;
   margin-top: 0;
   border-radius: 0;
@@ -309,6 +309,13 @@ input, textarea {
 
 /* Responsive table improvements */
 @media (max-width: 768px) {
+  .section-header h2 {
+    font-size: 18px;
+  }
+  .add-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
   table {
     font-size: 11px;
   }
@@ -377,6 +384,13 @@ input, textarea {
 }
 
 @media (max-width: 480px) {
+  .section-header h2 {
+    font-size: 16px;
+  }
+  .add-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
   table {
     font-size: 10px;
   }
@@ -440,4 +454,143 @@ input, textarea {
     min-width: 40px;
     max-width: 40px;
   }
+}
+
+/* Work Description Modal */
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modal-close {
+  font-size: 28px;
+  font-weight: bold;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #000;
+}
+
+.modal-body {
+  display: flex;
+  padding: 20px;
+  /* width: 100%; */
+  flex: 1;
+  /* overflow-y: auto; */
+}
+
+.modal-body textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.modal-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  background: #007bff;
+  color: white;
+}
+
+.modal-btn:hover {
+  background: #0056b3;
+}
+
+.modal-btn-cancel {
+  background: #6c757d;
+}
+
+.modal-btn-cancel:hover {
+  background: #545b62;
+}
+
+/* Work description cell styling */
+.work-desc-cell {
+  cursor: pointer;
+  padding: 8px;
+  min-height: 20px;
+  position: relative;
+}
+
+.work-desc-cell:hover {
+  background-color: #f0f0f0;
+}
+
+/* Time cell styling */
+.time-cell {
+  cursor: pointer;
+  padding: 8px;
+  min-height: 20px;
+  position: relative;
+}
+
+.time-cell:hover {
+  background-color: #f0f0f0;
+}
+
+.work-desc-display {
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.work-desc-display.empty {
+  color: #999;
+  font-style: italic;
+}
+
+.work-desc-input {
+  display: none;
 }

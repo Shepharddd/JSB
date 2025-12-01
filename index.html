@@ -106,7 +106,42 @@
       <button class="submit-btn" onclick="submitForm()">Submit</button>
     </div>
 
+    <!-- Work Description Popup Modal -->
+    <div id="workDescModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Work Description</h3>
+          <span class="modal-close" onclick="closeWorkDescModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <textarea id="workDescTextarea" rows="6" placeholder="Enter work description..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="saveWorkDescription()">Save</button>
+          <button class="modal-btn modal-btn-cancel" onclick="closeWorkDescModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Input Popup Modal -->
+    <div id="timeModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="timeModalTitle">Time</h3>
+          <span class="modal-close" onclick="closeTimeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <input type="time" id="timeInput" style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;" />
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="saveTime()">Save</button>
+          <button class="modal-btn modal-btn-cancel" onclick="closeTimeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <script src="https://alcdn.msauth.net/browser/2.32.2/js/msal-browser.min.js"></script>
+    <script src="auth.js"></script>
     <script src="site-form.js"></script>
   </body>
 </html>
