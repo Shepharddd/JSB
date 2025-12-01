@@ -70,35 +70,38 @@ async function getAccount() {
   }
 }
 
-
 async function getCompanyData(){
-  const token = await getAccessToken();
-  const url = 'https://default68237f8abf3c425bb92b9518c6d4bf.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1d22896883294970a2ca02e4d4ce2a8b/triggers/manual/paths/invoke?api-version=1';
   try {
-    const response = await fetch(url, {
-      method: 'POST', // Power Automate manual trigger usually expects POST
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      // Optional: only include if your flow expects input JSON
-      body: JSON.stringify({
-        filter: 'optionalFilterValue'
-      })
-    });
+        // Get access token
+        const token = await getAccessToken();
+        if (!token) throw new Error("No access token available");
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+
+        // Path to your Excel file in OneDrive
+        const filePath = "/Data.xlsx"; // change if different path
+        const tableName = "Table13"
+        const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows`;
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(`Error reading table: ${JSON.stringify(err)}`);
+        }
+
+        const data = await response.json();
+        console.log("Table data:", data.value); // data.value contains the rows
+        return data.value;
+    } catch (err) {
+        console.error(err);
+        alert("Error reading table: " + err.message);
     }
-
-    const data = await response.json();
-    // document.getElementById('output').textContent = JSON.stringify(data, null, 2);
-    console.log(data)
-    
-  } catch (error) {
-    console.log(error)
-    // document.getElementById('output').textContent = 'Error: ' + error;
-  }
 
 }
 
@@ -194,96 +197,6 @@ function makeTimeCellsClickable(row) {
   });
 }
 
-// async function submitForm() {
-
-//   try {
-//     const result = await msalInstance.loginPopup({ scopes: ["Files.ReadWrite"] });
-//     console.log(result);
-//     document.getElementById("loginStatus").innerText = `Logged in as ${result.account.username}`;
-//   } catch (err) {
-//     console.error("[Sign In Error]: ",err);
-//   }
-
-  
-//   const payload = {
-//     name: document.getElementById("nameInput").value,
-//     site: document.getElementById("siteInput").value,
-//     weather: document.getElementById("weatherInput").value,
-//     date: document.getElementById("dateInput").value,
-//     notes: document.getElementById("notesInput").value,
-//     employees: [...document.querySelectorAll("#employeeTable tr")] .slice(1).map(row => ({
-//     name: row.children[0].querySelector("input").value,
-//     timeIn: row.children[1].querySelector("input").value,
-//     timeOut: row.children[2].querySelector("input").value,
-//     works: row.children[3].querySelector("input").value,
-//   })),
-//     subcontractors: [...document.querySelectorAll("#subTable tr")] .slice(1).map(row => ({
-//       name: row.children[0].querySelector("input").value,
-//       timeIn: row.children[1].querySelector("input").value,
-//       timeOut: row.children[2].querySelector("input").value,
-//       works: row.children[3].querySelector("input").value,
-//     })),
-//   };
-
-//   fetch("YOUR_POWER_AUTOMATE_WEBHOOK_URL", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(payload)
-//   })
-//   .then(res => alert("Submitted!"))
-//   .catch(err => alert("Error submitting"));
-// }
-
-async function submitFormDepr() {
-  // Get basic info
-  const name = document.getElementById("nameInput").value;
-  const site = document.getElementById("siteInput").value;
-  const weather = document.getElementById("weatherInput").value;
-  const date = new Date(document.getElementById("dateInput").value).getTime() / (1000*60*60*24); // Excel date number
-  const notes = document.getElementById("notesInput").value;
-
-  // Flatten employees
-  const employees = [...document.querySelectorAll("#employeeTable tr")].slice(1)
-    .flatMap(row => {
-      const cells = row.children;
-      const nameInput = cells[0].querySelector("input") || cells[0].querySelector("select");
-      return [
-        nameInput ? nameInput.value : "",                          // Name
-        timeToExcelFraction(cells[1].querySelector("input").value), // Time In fraction
-        timeToExcelFraction(cells[2].querySelector("input").value), // Time Out fraction
-        cells[3].querySelector("input").value                      // Work description
-      ];
-    });
-
-  // Flatten subcontractors
-  const subcontractors = [...document.querySelectorAll("#subTable tr")].slice(1)
-    .flatMap(row => {
-      const cells = row.children;
-      return [
-        cells[0].querySelector("input").value,
-        timeToExcelFraction(cells[1].querySelector("input").value),
-        timeToExcelFraction(cells[2].querySelector("input").value),
-        cells[3].querySelector("input").value
-      ];
-    });
-  
-  // Note: Plant/Equipment data is not currently included in the submission
-  // Add it here if needed in the future
-
-  // Merge all into a single array (following your example)
-  const resultArray = [
-    [name, date, site, weather, notes, ...employees, ...subcontractors]
-  ];
-
-  // Send as string under "result"
-  const payload = {
-    result: JSON.stringify(resultArray)
-  };
-
-  // --- Send to Excel ---
-  await addRowsToTable("Table1", resultArray);
-}
-
 async function submitForm() {
     // --- Main info ---
     const name = document.getElementById("nameInput").value || "";
@@ -337,15 +250,6 @@ async function submitForm() {
     const fullRow = [name, date, site, weather, log, ...flatEmployees, ...flatSubs];
 
     await addRowsToTable("Table1", [fullRow]);
-    // --- Send to Excel ---
-    // try {
-    //     // const token = await getAccessToken();
-    //     await addRowsToTable("Table1", [fullRow], token);
-    //     alert("Submitted successfully!");
-    // } catch (err) {
-    //     console.error("Submit Error:", err);
-    //     alert("Error submitting: " + err.message);
-    // }
 }
 
 // --- Helper: convert HH:MM to Excel fraction ---
