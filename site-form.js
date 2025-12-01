@@ -63,9 +63,9 @@ async function getAccount() {
     console.log("No user logged in → redirecting…");
     msalInstance.loginRedirect({
       scopes: [
-        "User.Read",
+        // "User.Read",
         "[CLIENT_ID]/.default",
-        "https://service.flow.microsoft.com//User",
+        // "https://service.flow.microsoft.com//User",
       ]
     });
 
