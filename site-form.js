@@ -26,9 +26,28 @@ async function getAccessToken() {
   return token.accessToken;
 }
 
+async function login() {
+  const loginRequest = {
+    scopes: ["User.Read"] // permissions you need
+  };
+
+  await msalInstance.loginPopup(loginRequest)
+    .then((loginResponse) => {
+      console.log("Logged in user:", loginResponse.account.username);
+      // hide your popup here if login succeeds
+      closePopup();
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+
 async function getAccount() {
   try {
-    const result = await msalInstance.handleRedirectPromise();
+    // const result = await msalInstance.handleRedirectPromise();
+
+
   
     if (result) {
       console.log("Logged in:", result.account.username);
@@ -37,19 +56,24 @@ async function getAccount() {
     }
   
     const accounts = msalInstance.getAllAccounts();
-    ACCOUNT = accounts[0]
-    console.log(accounts[0])
+    if (accounts.length > 0) {
+      ACCOUNT = accounts[0]
+      console.log(accounts[0])
+        // // User is logged in
+        // const activeAccount = accounts[0]; // You can pick the first one or manage multiple accounts
+        // console.log("User is logged in:", activeAccount.username);
+    } else {
+        // No user is logged in
+        console.log("No user is logged in");
+        login();
+    }
     
-    msalInstance.loginRedirect({
-      scopes: ["User.Read"]
-    });
+    // msalInstance.loginRedirect({
+    //   scopes: ["User.Read"]
+    // });
   } catch (error) {
     console.log(error)
   }
-  // msalInstance.handleRedirectPromise().then(async result => {
-  
-  
-  // }).catch((error) => console.log(error));
 }
 
 async function getCompanyData(){
@@ -86,7 +110,8 @@ async function getCompanyData(){
 async function init() {
   setToday();
   getWeatherDescription();
-  await getAccount();
+  login();
+  // await getAccount();
 
 }
 
