@@ -234,7 +234,7 @@ function makeTimeCellsClickable(row) {
 //   .catch(err => alert("Error submitting"));
 // }
 
-async function submitForm() {
+async function submitFormDepr() {
   // Get basic info
   const name = document.getElementById("nameInput").value;
   const site = document.getElementById("siteInput").value;
@@ -283,6 +283,78 @@ async function submitForm() {
   // --- Send to Excel ---
   await addRowsToTable("Table1", resultArray);
 }
+
+async function submitForm() {
+    // --- Main info ---
+    const name = document.getElementById("nameInput").value || "";
+    const site = document.getElementById("siteInput").value || "";
+    const weather = document.getElementById("weatherInput").value || "";
+    const dateValue = document.getElementById("dateInput").value;
+    const date = dateValue ? new Date(dateValue).getTime() / (1000*60*60*24) : "";
+    const log = document.getElementById("notesInput").value || "";
+
+    // --- Employees (max 5) ---
+    const employeeRows = [...document.querySelectorAll("#employeeTable tr")].slice(1)
+        .slice(0, 5) // only take first 5
+        .map(row => {
+            const cells = row.children;
+            const nameInput = cells[0].querySelector("input") || cells[0].querySelector("select");
+            const timeIn = cells[1].querySelector("input") ? timeToExcelFraction(cells[1].querySelector("input").value) : "";
+            const timeOut = cells[2].querySelector("input") ? timeToExcelFraction(cells[2].querySelector("input").value) : "";
+            const desc = cells[3].querySelector("input") ? cells[3].querySelector("input").value : "";
+            return [nameInput ? nameInput.value : "", timeIn, timeOut, desc];
+        });
+
+    // Pad to 5 employees
+    while (employeeRows.length < 5) {
+        employeeRows.push(["", "", "", ""]);
+    }
+
+    // Flatten employees
+    const flatEmployees = employeeRows.flat();
+
+    // --- Subcontractors (max 5) ---
+    const subRows = [...document.querySelectorAll("#subTable tr")].slice(1)
+        .slice(0, 5)
+        .map(row => {
+            const cells = row.children;
+            const name = cells[0].querySelector("input") ? cells[0].querySelector("input").value : "";
+            const timeIn = cells[1].querySelector("input") ? timeToExcelFraction(cells[1].querySelector("input").value) : "";
+            const timeOut = cells[2].querySelector("input") ? timeToExcelFraction(cells[2].querySelector("input").value) : "";
+            const desc = cells[3].querySelector("input") ? cells[3].querySelector("input").value : "";
+            return [name, timeIn, timeOut, desc];
+        });
+
+    // Pad to 5 subcontractors
+    while (subRows.length < 5) {
+        subRows.push(["", "", "", ""]);
+    }
+
+    // Flatten subcontractors
+    const flatSubs = subRows.flat();
+
+    // --- Combine everything into a single row ---
+    const fullRow = [name, date, site, weather, log, ...flatEmployees, ...flatSubs];
+
+    await addRowsToTable("Table1", fullRow);
+    // --- Send to Excel ---
+    // try {
+    //     // const token = await getAccessToken();
+    //     await addRowsToTable("Table1", [fullRow], token);
+    //     alert("Submitted successfully!");
+    // } catch (err) {
+    //     console.error("Submit Error:", err);
+    //     alert("Error submitting: " + err.message);
+    // }
+}
+
+// --- Helper: convert HH:MM to Excel fraction ---
+function timeToExcelFraction(timeStr) {
+    if(!timeStr) return 0;
+    const [h, m] = timeStr.split(":").map(Number);
+    return (h + m/60) / 24;
+}
+
 
 // --- Function to add rows to a table ---
 async function addRowsToTable(tableName, payload) {
