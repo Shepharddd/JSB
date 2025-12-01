@@ -281,18 +281,17 @@ async function submitForm() {
   };
 
   // --- Send to Excel ---
-  await addRowsToTable("Table1", payload);
+  await addRowsToTable("Table1", resultArray);
 }
 
 // --- Function to add rows to a table ---
-async function addRowsToTable(tableName, rows) {
+async function addRowsToTable(tableName, payload) {
     const filePath = '/Data.xlsx'
     const token = await getAccessToken();
 
-
     // if (!rows.length) return;
     const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows/add`;
-    const body = { values: rows };
+    // const body = { values: rows };
     console.log("Posting Request With Data: ", rows)
     const res = await fetch(url, {
       method: "POST",
@@ -300,7 +299,7 @@ async function addRowsToTable(tableName, rows) {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(payload)
     });
     console.log("Posting Done: ", res)
     if (!res.ok) {
