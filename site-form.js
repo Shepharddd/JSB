@@ -25,6 +25,7 @@ function setAccount(account) {
 }
 
 async function getAccessToken() {
+  console.log("Account: ", ACCOUNT)
   if (!ACCOUNT) return;
 
   const token = await msalInstance.acquireTokenSilent({
