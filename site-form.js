@@ -336,7 +336,7 @@ async function submitForm() {
     // --- Combine everything into a single row ---
     const fullRow = [name, date, site, weather, log, ...flatEmployees, ...flatSubs];
 
-    await addRowsToTable("Table1", fullRow);
+    await addRowsToTable("Table1", [fullRow]);
     // --- Send to Excel ---
     // try {
     //     // const token = await getAccessToken();
