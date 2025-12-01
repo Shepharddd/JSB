@@ -30,6 +30,20 @@ function addSites(data) {
   });
 }
 
+function addEmployees(data) {
+  sites = data
+  // Get the select element
+  const siteSelect = document.getElementById("siteInput");
+
+  // Add each site as an option
+  sites.forEach(site => {
+    const option = document.createElement("option");
+    option.value = site;
+    option.textContent = site;
+    siteSelect.appendChild(option);
+  });
+}
+
 
 function setToday() {
   const today = new Date().toISOString().split("T")[0];
@@ -114,9 +128,10 @@ async function getCompanyData(){
         }
 
         const data = await response.json();
-        const [plant_items, employees, sites] = flattenTableData(data.value)
+        const [plant_items, employees, sites] = extractCategories(data)
 
         console.log("Table data:", plant_items); // data.value contains the rows
+        addSites(sites)
         return data.value;
     } catch (err) {
         console.error(err);
