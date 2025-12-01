@@ -289,10 +289,11 @@ async function addRowsToTable(tableName, rows) {
     const filePath = '/Data.xlsx'
     const token = await getAccessToken();
 
-    if (!rows.length) return;
+
+    // if (!rows.length) return;
     const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows/add`;
     const body = { values: rows };
-    console.log("Posting Request...")
+    console.log("Posting Request With Data: ", rows)
     const res = await fetch(url, {
       method: "POST",
       headers: {
