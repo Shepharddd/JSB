@@ -37,23 +37,6 @@ async function getAccessToken() {
   return token.accessToken;
 }
 
-// async function login() {
-//   const loginRequest = {
-//     scopes: ["User.Read"] // permissions you need
-//   };
-
-//   await msalInstance.loginPopup(loginRequest)
-//     .then((loginResponse) => {
-//       console.log("Logged in user:", loginResponse.account.username);
-//       // hide your popup here if login succeeds
-//       closePopup();
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//     });
-// }
-
-
 async function getAccount() {
   console.log("Getting User Account");
 
@@ -96,7 +79,7 @@ async function getCompanyData(){
       method: 'POST', // Power Automate manual trigger usually expects POST
       headers: {
         'Content-Type': 'application/json',
-        ...({ 'Authorization': `Bearer ${token}` })
+        // ...({ 'Authorization': `Bearer ${token}` })
       },
       // Optional: only include if your flow expects input JSON
       body: JSON.stringify({
