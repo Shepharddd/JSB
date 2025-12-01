@@ -117,8 +117,8 @@ async function getCompanyData(){
 async function init() {
   setToday();
   getWeatherDescription();
-  login();
-  // await getAccount();
+  // login();
+  await getAccount();
 
 }
 
