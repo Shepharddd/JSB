@@ -18,6 +18,12 @@ function setToday() {
 
 let ACCOUNT = null;
 
+function setAccount(account) {
+  ACCOUNT = account;
+  console.log(ACCOUNT)
+  getCompanyData();
+}
+
 async function getAccessToken() {
   if (!ACCOUNT) return;
 
@@ -40,7 +46,6 @@ async function login() {
       console.log("Logged in user:", loginResponse.account.username);
       // hide your popup here if login succeeds
       closePopup();
-      getCompanyData();
     })
     .catch((error) => {
       console.error(error);
@@ -50,30 +55,28 @@ async function login() {
 
 async function getAccount() {
   try {
-    // const result = await msalInstance.handleRedirectPromise();
+    const result = await msalInstance.handleRedirectPromise();
   
-    // if (result) {
-    //   console.log("Logged in:", result.account.username);
-    //   return;
-    // }
-    
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      ACCOUNT = accounts[0]
-      console.log(accounts[0])
-      getCompanyData();
-        // // User is logged in
-        // const activeAccount = accounts[0]; // You can pick the first one or manage multiple accounts
-        // console.log("User is logged in:", activeAccount.username);
-    } else {
-        // No user is logged in
-        console.log("No user is logged in");
-        login();
+    if (result) {
+      console.log("Logged in:", result.account.username);
+
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        setAccount(accounts[0])
+        // getCompanyData();
+          // // User is logged in
+          // const activeAccount = accounts[0]; // You can pick the first one or manage multiple accounts
+          // console.log("User is logged in:", activeAccount.username);
+      } else {
+          // No user is logged in
+          console.log("No user is logged in");
+          msalInstance.loginRedirect({
+            scopes: ["User.Read"]
+          });
+      }
+      return;
     }
-    
-    // msalInstance.loginRedirect({
-    //   scopes: ["User.Read"]
-    // });
+  
   } catch (error) {
     console.log(error)
   }
