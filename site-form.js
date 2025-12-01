@@ -5,7 +5,11 @@ const msalInstance = new msal.PublicClientApplication({
     authority: "https://login.microsoftonline.com/common",
     // redirectUri: window.location.origin,
     redirectUri: "https://timesheets.jamessamuelsbuilder.com.au/"
-}});
+  },
+  system: {
+    navigateToLoginRequestUrl: false
+  }
+});
 
 function setToday() {
   const today = new Date().toISOString().split("T")[0];
