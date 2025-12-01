@@ -371,7 +371,7 @@ async function addRowsToTable(tableName, payload) {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ values: payload })
     });
     console.log("Posting Done: ", res)
     if (!res.ok) {
