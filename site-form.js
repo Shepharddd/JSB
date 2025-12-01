@@ -96,13 +96,25 @@ async function getCompanyData(){
         }
 
         const data = await response.json();
-        console.log("Table data:", data.value); // data.value contains the rows
+        const rows = flattenTableData(data.value)
+
+        console.log("Table data:", rows); // data.value contains the rows
         return data.value;
     } catch (err) {
         console.error(err);
         alert("Error reading table: " + err.message);
     }
 
+}
+
+function flattenTableData(data) {
+    return data.map(row => {
+        if (row.values && row.values[0] && row.values[0].length === 2) {
+            const [key, value] = row.values[0];
+            return { [key]: value };
+        }
+        return {};
+    });
 }
 
 async function init() {
@@ -196,6 +208,8 @@ function makeTimeCellsClickable(row) {
     }
   });
 }
+
+
 
 async function submitForm() {
     // --- Main info ---
@@ -449,4 +463,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
 
