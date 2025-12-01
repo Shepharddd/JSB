@@ -47,17 +47,12 @@ function addSites(data) {
 
 function addEmployees(data) {
   employees = data
-  // Get the select element
-  const siteSelect = document.getElementById("siteInput");
-
-  // Add each site as an option
-  sites.forEach(site => {
-    const option = document.createElement("option");
-    option.value = site;
-    option.textContent = site;
-    siteSelect.appendChild(option);
-  });
 }
+
+function addPlant(data) {
+  plant = data
+}
+
 
 function setToday() {
   const today = new Date().toISOString().split("T")[0];
@@ -147,6 +142,8 @@ async function getCompanyData(){
         console.log("Table data:", plant_items); // data.value contains the rows
         addSites(sites)
         addForemen(foremen)
+        addEmployees(employees)
+        addPlant(plant_items)
         return data.value;
     } catch (err) {
         console.error(err);
@@ -196,13 +193,29 @@ document.getElementById("loginBtn").onclick = async () => {
 function addEmployeeRow() {
   const table = document.getElementById("employeeTable");
   const row = table.insertRow();
+
+  // Build the options HTML dynamically
+  let optionsHtml = `<option value="">Select...</option>`;
+  employees.forEach(emp => {
+    optionsHtml += `<option value="${emp}">${emp}</option>`;
+  });
+
   row.innerHTML = `
-    <td><select><option value="">Select...</option></select></td>
-    <td><span class="time-display">07:00</span><input type="time" value="07:00" style="display: none;" /></td>
-    <td><span class="time-display">15:30</span><input type="time" value="15:30" style="display: none;" /></td>
+    <td>
+      <select>${optionsHtml}</select>
+    </td>
+    <td>
+      <span class="time-display">07:00</span>
+      <input type="time" value="07:00" style="display: none;" />
+    </td>
+    <td>
+      <span class="time-display">15:30</span>
+      <input type="time" value="15:30" style="display: none;" />
+    </td>
     <td><input type="text" placeholder="Work description" /></td>
     <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
   `;
+
   makeTimeCellsClickable(row);
 }
 
@@ -222,12 +235,22 @@ function addSubRow() {
 function addPlantRow() {
   const table = document.getElementById("plantTable");
   const row = table.insertRow();
+
+  // Build the options HTML dynamically
+  let optionsHtml = `<option value="">Select...</option>`;
+  plant.forEach(item => {
+    optionsHtml += `<option value="${item}">${item}</option>`;
+  });
+
   row.innerHTML = `
-    <td><select><option value="">Select...</option></select></td>
+    <td>
+      <select>${optionsHtml}</select>
+    </td>
     <td><input type="text" placeholder="Work description" /></td>
     <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
   `;
 }
+
 
 function deleteRow(button) {
   const row = button.closest("tr");
