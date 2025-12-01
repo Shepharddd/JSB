@@ -140,6 +140,23 @@
       </div>
     </div>
 
+    <!-- Subcontractor Name Input Popup Modal -->
+    <div id="subNameModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Subcontractor Name</h3>
+          <span class="modal-close" onclick="closeSubNameModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="subNameInput" placeholder="Enter subcontractor name..." style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;" />
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="saveSubName()">Save</button>
+          <button class="modal-btn modal-btn-cancel" onclick="closeSubNameModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
     <script src="https://alcdn.msauth.net/browser/2.32.2/js/msal-browser.min.js"></script>
     <script src="auth.js"></script>
     <script src="site-form.js"></script>

@@ -579,6 +579,30 @@ input, textarea {
   background-color: #f0f0f0;
 }
 
+/* Subcontractor name cell styling */
+.sub-name-cell {
+  cursor: pointer;
+  padding: 8px;
+  min-height: 20px;
+  position: relative;
+}
+
+.sub-name-cell:hover {
+  background-color: #f0f0f0;
+}
+
+.sub-name-display {
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub-name-display.empty {
+  color: #999;
+  font-style: italic;
+}
+
 .work-desc-display {
   color: #333;
   white-space: nowrap;

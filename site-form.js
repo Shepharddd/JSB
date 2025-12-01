@@ -150,7 +150,10 @@ function addSubRow() {
   const table = document.getElementById("subTable");
   const row = table.insertRow();
   row.innerHTML = `
-    <td><input type="text" placeholder="Name" /></td>
+    <td class="sub-name-cell" onclick="openSubNameModal(this)">
+      <span class="sub-name-display empty">Click to add name</span>
+      <input type="hidden" class="sub-name-input" value="" />
+    </td>
     <td class="time-cell" onclick="openTimeModal(this, 'Time In')">
       <span class="time-display">07:00</span>
       <input type="hidden" class="time-input" value="07:00" />
@@ -245,6 +248,58 @@ function saveTime() {
   closeTimeModal();
 }
 
+// Subcontractor Name Modal Functions
+let currentSubNameCell = null;
+
+function openSubNameModal(cell) {
+  currentSubNameCell = cell;
+  const modal = document.getElementById("subNameModal");
+  const textInput = document.getElementById("subNameInput");
+  const hiddenInput = cell.querySelector('.sub-name-input');
+  const display = cell.querySelector('.sub-name-display');
+  
+  // Load existing value
+  textInput.value = hiddenInput ? hiddenInput.value : '';
+  
+  // Show modal
+  modal.style.display = 'flex';
+  textInput.focus();
+}
+
+function closeSubNameModal() {
+  const modal = document.getElementById("subNameModal");
+  modal.style.display = 'none';
+  currentSubNameCell = null;
+}
+
+function saveSubName() {
+  if (!currentSubNameCell) return;
+  
+  const textInput = document.getElementById("subNameInput");
+  const hiddenInput = currentSubNameCell.querySelector('.sub-name-input');
+  const display = currentSubNameCell.querySelector('.sub-name-display');
+  
+  const value = textInput.value.trim();
+  
+  // Save to hidden input
+  if (hiddenInput) {
+    hiddenInput.value = value;
+  }
+  
+  // Update display
+  if (display) {
+    if (value) {
+      display.textContent = value;
+      display.classList.remove('empty');
+    } else {
+      display.textContent = 'Click to add name';
+      display.classList.add('empty');
+    }
+  }
+  
+  closeSubNameModal();
+}
+
 // Work Description Modal Functions
 let currentWorkDescCell = null;
 
@@ -301,11 +356,15 @@ function saveWorkDescription() {
 window.onclick = function(event) {
   const workDescModal = document.getElementById("workDescModal");
   const timeModal = document.getElementById("timeModal");
+  const subNameModal = document.getElementById("subNameModal");
   if (event.target === workDescModal) {
     closeWorkDescModal();
   }
   if (event.target === timeModal) {
     closeTimeModal();
+  }
+  if (event.target === subNameModal) {
+    closeSubNameModal();
   }
 }
 
@@ -346,7 +405,8 @@ async function submitForm() {
         .slice(0, 5)
         .map(row => {
             const cells = row.children;
-            const name = cells[0].querySelector("input") ? cells[0].querySelector("input").value : "";
+            const nameInput = cells[0].querySelector(".sub-name-input");
+            const name = nameInput ? nameInput.value : "";
             const timeInInput = cells[1].querySelector(".time-input");
             const timeOutInput = cells[2].querySelector(".time-input");
             const timeIn = timeInInput ? timeToExcelFraction(timeInInput.value) : "";
