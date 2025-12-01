@@ -29,7 +29,7 @@ async function getAccessToken() {
   if (!ACCOUNT) return;
 
   const token = await msalInstance.acquireTokenSilent({
-    scopes: ["https://logic.azure.com/"],
+    scopes: ["https://service.flow.microsoft.com/User"],
     account: ACCOUNT,
   });
 
@@ -67,7 +67,7 @@ async function getAccount() {
       //   // "[CLIENT_ID]/.default",
       //   "https://service.flow.microsoft.com/User",
       // ]
-      scopes: ["https://logic.azure.com/"]
+      scopes: ["https://service.flow.microsoft.com/User"]
     });
 
   } catch (error) {
