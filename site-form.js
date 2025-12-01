@@ -2,7 +2,7 @@
 const msalInstance = new msal.PublicClientApplication({
   auth: {
     clientId: "911b26da-32a3-4e6f-b3a7-6ec57e5063a2",
-    authority: "https://login.microsoftonline.com/common/",
+    authority: "https://login.microsoftonline.com/68237f8a-bf3c-425b-b92b-9518c6d4bf18/",
     // redirectUri: window.location.origin,
     redirectUri: "https://timesheets.jamessamuelsbuilder.com.au/"
   },
@@ -10,6 +10,8 @@ const msalInstance = new msal.PublicClientApplication({
     navigateToLoginRequestUrl: false
   }
 });
+const tokenRequest = { scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"] };
+
 
 function setToday() {
   const today = new Date().toISOString().split("T")[0];
@@ -29,7 +31,7 @@ async function getAccessToken() {
   if (!ACCOUNT) return;
 
   const token = await msalInstance.acquireTokenSilent({
-    scopes: ["https://service.flow.microsoft.com/User"],
+    scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"],
     account: ACCOUNT,
   });
 
@@ -61,14 +63,7 @@ async function getAccount() {
 
     // Step 3 — no user signed in → start login
     console.log("No user logged in → redirecting…");
-    msalInstance.loginRedirect({
-      // scopes: [
-      //   // "User.Read",
-      //   // "[CLIENT_ID]/.default",
-      //   "https://service.flow.microsoft.com/User",
-      // ]
-      scopes: ["https://service.flow.microsoft.com/User"]
-    });
+    msalInstance.loginRedirect(tokenRequest);
 
   } catch (error) {
     console.error("getAccount Error:", error);
@@ -239,7 +234,7 @@ function makeTimeCellsClickable(row) {
 //   .catch(err => alert("Error submitting"));
 // }
 
-function submitForm() {
+async function submitForm() {
   // Get basic info
   const name = document.getElementById("nameInput").value;
   const site = document.getElementById("siteInput").value;
@@ -285,13 +280,30 @@ function submitForm() {
     result: JSON.stringify(resultArray)
   };
 
-  fetch("https://default68237f8abf3c425bb92b9518c6d4bf.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/95a3332058cc435ba3dc09ec8454ab2e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uQZO00H7wt1z8RHqtiLH5mhVO30CboF2_wSHvH9uB-U", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-  .then(res => alert("Submitted!"))
-  .catch(err => alert("Error submitting"));
+  // --- Send to Excel ---
+  await addRowsToTable("Table1", payload);
+}
+
+// --- Function to add rows to a table ---
+async function addRowsToTable(tableName, rows) {
+    const filePath = 'Data.xlsx'
+
+    if (!rows.length) return;
+    const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows/add`;
+    const body = { values: rows };
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+        const err = await res.json();
+        console.error(`Error adding to ${tableName}:`, err);
+        alert(`Error adding to ${tableName}`);
+    }
 }
 
 // Convert HH:MM to Excel fraction
