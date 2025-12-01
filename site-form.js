@@ -20,12 +20,12 @@ let ACCOUNT = null;
 
 function setAccount(account) {
   ACCOUNT = account;
-  console.log(ACCOUNT)
+  console.log("Got Account: ", ACCOUNT)
   getCompanyData();
 }
 
 async function getAccessToken() {
-  console.log("Account: ", ACCOUNT)
+  console.log("Retreiving Access Token for Account: ", ACCOUNT)
   if (!ACCOUNT) return;
 
   const token = await msalInstance.acquireTokenSilent({
@@ -33,29 +33,31 @@ async function getAccessToken() {
     account: ACCOUNT,
   });
 
-  console.log(token.accessToken)
-  return token.access_token;
+  console.log("Got Token: ", token)
+  return token.accessToken;
 }
 
-async function login() {
-  const loginRequest = {
-    scopes: ["User.Read"] // permissions you need
-  };
+// async function login() {
+//   const loginRequest = {
+//     scopes: ["User.Read"] // permissions you need
+//   };
 
-  await msalInstance.loginPopup(loginRequest)
-    .then((loginResponse) => {
-      console.log("Logged in user:", loginResponse.account.username);
-      // hide your popup here if login succeeds
-      closePopup();
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-}
+//   await msalInstance.loginPopup(loginRequest)
+//     .then((loginResponse) => {
+//       console.log("Logged in user:", loginResponse.account.username);
+//       // hide your popup here if login succeeds
+//       closePopup();
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//     });
+// }
 
 
 async function getAccount() {
   try {
+    console.log("Getting User Account")
+
     const result = await msalInstance.handleRedirectPromise();
   
     if (result) {
@@ -79,7 +81,7 @@ async function getAccount() {
     }
   
   } catch (error) {
-    console.log(error)
+    console.log("Error: ", error)
   }
 }
 
@@ -115,10 +117,10 @@ async function getCompanyData(){
 }
 
 async function init() {
+  getAccount();
   setToday();
   getWeatherDescription();
   // login();
-  await getAccount();
 
 }
 
