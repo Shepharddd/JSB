@@ -292,14 +292,16 @@ async function addRowsToTable(tableName, rows) {
     if (!rows.length) return;
     const url = `https://graph.microsoft.com/v1.0/me/drive/root:${filePath}:/workbook/tables/${tableName}/rows/add`;
     const body = { values: rows };
+    console.log("Posting Request...")
     const res = await fetch(url, {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
     });
+    console.log("Posting Done: ", res)
     if (!res.ok) {
         const err = await res.json();
         console.error(`Error adding to ${tableName}:`, err);
