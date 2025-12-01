@@ -18,7 +18,9 @@ body {
 }
 .two-col {
   display: flex;
+  justify-content: space-between;
   gap: 20px;
+  width: 100%;
   align-items: stretch;
   min-height: 100%;
 }
