@@ -64,7 +64,7 @@ async function getAccount() {
     msalInstance.loginRedirect({
       scopes: [
         "User.Read",
-        "https://service.flow.microsoft.com/User",
+        "https://service.flow.microsoft.com//User",
       ]
     });
 
