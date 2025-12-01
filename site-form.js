@@ -79,7 +79,7 @@ async function getCompanyData(){
       method: 'POST', // Power Automate manual trigger usually expects POST
       headers: {
         'Content-Type': 'application/json',
-        // ...({ 'Authorization': `Bearer ${token}` })
+        ...({ 'Authorization': `Bearer ${token}` })
       },
       // Optional: only include if your flow expects input JSON
       body: JSON.stringify({
