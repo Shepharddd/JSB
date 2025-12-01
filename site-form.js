@@ -65,7 +65,7 @@ async function getAccount() {
       scopes: [
         // "User.Read",
         // "[CLIENT_ID]/.default",
-        "https://service.flow.microsoft.com//User",
+        "https://service.flow.microsoft.com/User",
       ]
     });
 
