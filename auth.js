@@ -4,84 +4,61 @@ const msalInstance = new msal.PublicClientApplication({
     clientId: "911b26da-32a3-4e6f-b3a7-6ec57e5063a2",
     authority: "https://login.microsoftonline.com/68237f8a-bf3c-425b-b92b-9518c6d4bf18/",
     redirectUri: "https://timesheets.jamessamuelsbuilder.com.au/"
+    // redirectUri: "http://localhost:8000/"
   },
   system: {
     navigateToLoginRequestUrl: false
   }
 });
 
-const tokenRequest = { scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"] };
+const scopes = ["Files.ReadWrite", "Sites.ReadWrite.All", "User.ReadBasic.All"]
 
-let ACCOUNT = null;
+const tokenRequest = { scopes: scopes };
 
-function setAccount(account) {
-  ACCOUNT = account;
-  console.log("Got Account: ", ACCOUNT);
-  if (typeof getCompanyData === 'function') {
-    getCompanyData();
-  }
-}
+// let ACCOUNT = null;
 
-async function getAccessToken() {
-  console.log("Retrieving Access Token for Account: ", ACCOUNT);
-  if (!ACCOUNT) return;
+// async function setAccount(account) {
+//   ACCOUNT = account;
+//   console.log("Got Account: ", ACCOUNT);
+//   if (typeof getCompanyData === 'function') {
+//     getCompanyData();
+//   }
+// }
+
+async function getAccessToken(account) {
+  console.log("Retrieving Access Token for Account: ", account.name);
+  if (!account) return;
 
   const token = await msalInstance.acquireTokenSilent({
-    scopes: ["Files.ReadWrite", "Sites.ReadWrite.All"],
-    account: ACCOUNT,
+    scopes: scopes,
+    account: account,
   });
 
-  console.log("Got Token: ", token);
-  return token.accessToken;
+  if (!token) throw new Error("No access token available");
+
+  return token;
 }
 
-async function getAccount() {
-  console.log("Getting User Account");
+async function getAuth() {
 
-  try {
-    // Step 1 — see if this load is returning from redirect login
-    const result = await msalInstance.handleRedirectPromise();
+  // Step 1 — see if this load is returning from redirect login
+  const result = await msalInstance.handleRedirectPromise();
 
-    if (result) {
-      console.log("Redirect login detected for:", result.account.username);
-      setAccount(result.account);
-      return;
-    }
-
-    // Step 2 — no redirect result → check if user already signed in
-    const accounts = msalInstance.getAllAccounts();
-
-    if (accounts.length > 0) {
-      console.log("User already logged in:", accounts[0].username);
-      setAccount(accounts[0]);
-      return;
-    }
-
-    // Step 3 — no user signed in → start login
-    console.log("No user logged in → redirecting…");
-    msalInstance.loginRedirect(tokenRequest);
-
-  } catch (error) {
-    console.error("getAccount Error:", error);
+  if (result) {
+    console.log("Redirect login detected for:", result.account.username);
+    return getAccessToken(result.account);
   }
+
+  // Step 2 — no redirect result → check if user already signed in
+  const accounts = msalInstance.getAllAccounts();
+
+  if (accounts.length > 0) {
+    console.log("User already logged in:", accounts[0].username);
+    return getAccessToken(accounts[0]);
+  }
+
+  // Step 3 — no user signed in → start login
+  console.log("No user logged in → redirecting…");
+  msalInstance.loginRedirect(tokenRequest);
+  
 }
-
-// Login button handler
-document.addEventListener("DOMContentLoaded", () => {
-  const loginBtn = document.getElementById("loginBtn");
-  if (loginBtn) {
-    loginBtn.onclick = async () => {
-      try {
-        const result = await msalInstance.loginPopup({ scopes: ["Files.ReadWrite"] });
-        console.log(result);
-        const loginStatus = document.getElementById("loginStatus");
-        if (loginStatus) {
-          loginStatus.innerText = `Logged in as ${result.account.username}`;
-        }
-      } catch (err) {
-        console.error("[Sign In Error]: ", err);
-      }
-    };
-  }
-});
-

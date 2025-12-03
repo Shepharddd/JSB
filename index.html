@@ -8,6 +8,11 @@
     <link rel="icon" href="favicon.webp" type="image/webp">
   </head>
   <body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading...</p>
+    </div>
     <!-- <p id="loginStatus"></p> -->
     <div class="section">
       
@@ -158,6 +163,7 @@
     </div>
 
     <script src="https://alcdn.msauth.net/browser/2.32.2/js/msal-browser.min.js"></script>
+    <script src="graph-api.js"></script>
     <script src="auth.js"></script>
     <script src="site-form.js"></script>
   </body>

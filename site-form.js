@@ -1,26 +1,32 @@
 // Auth functions are now in auth.js
 
-let sites = []
-let foremen = []
-let employees = []
-let plant = []
+let loading = true;
 
-function addForemen(data) {
-  foremen = data
+let token;
+
+// let site = "";
+let sites = [];
+let foremen = [];
+let employees = [];
+let plant = [];
+
+function addUsers(thisUser, users) {
   // Get the select element
   const siteSelect = document.getElementById("nameInput");
 
   // Add each site as an option
-  foremen.forEach(foreman => {
+  users.forEach(user => {
     const option = document.createElement("option");
-    option.value = foreman;
-    option.textContent = foreman;
+    option.value = user;
+    option.textContent = user;
     siteSelect.appendChild(option);
   });
+  siteSelect.value = thisUser;
+
 }
 
-function addSites(data) {
-  sites = data
+function addSites(thisSite, sites) {
+  sites = [thisSite]
   // Get the select element
   const siteSelect = document.getElementById("siteInput");
 
@@ -31,6 +37,7 @@ function addSites(data) {
     option.textContent = site;
     siteSelect.appendChild(option);
   });
+  siteSelect.value = thisSite;
 }
 
 function addEmployees(data) {
@@ -41,79 +48,41 @@ function addPlant(data) {
   plant = data
 }
 
-
 function setToday() {
   const today = new Date().toISOString().split("T")[0];
   document.getElementById("dateInput").value = today;
 }
 
-// Auth functions (getAccount, getAccessToken, setAccount) are now in auth.js
-async function getCompanyData(){
-  try {
-        // Get access token
-        const token = await getAccessToken();
-        if (!token) throw new Error("No access token available");
-
-        const otherUser = "admin@jamessamuelsbuilder.com.au"; // or user ID
-        const fileName = "Data.xlsx";
-        const tableId = "Table13";
-
-        const url = `https://graph.microsoft.com/v1.0/users('${otherUser}')/drive/root:/${fileName}:/workbook/tables('${tableId}')/rows`;
-
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        });
-
-        if (!response.ok) {
-            const err = await response.json();
-            throw new Error(`Error reading table: ${JSON.stringify(err)}`);
-        }
-
-        const data = await response.json();
-        const [plant_items, employees, sites, foremen] = extractCategories(data)
-
-        console.log("Table data:", plant_items); // data.value contains the rows
-        addSites(sites)
-        addForemen(foremen)
-        addEmployees([...employees, ...foremen])
-        addPlant(plant_items)
-        return data.value;
-    } catch (err) {
-        console.error(err);
-        alert("Error reading table: " + err.message);
+function updateLoadingDisplay() {
+  const loadingOverlay = document.getElementById("loadingOverlay");
+  if (loadingOverlay) {
+    if (loading) {
+      loadingOverlay.classList.remove("hidden");
+    } else {
+      loadingOverlay.classList.add("hidden");
     }
-
-}
-
-function extractCategories(rawData) {
-    const categories = {};
-
-    rawData.value.forEach(row => {
-        if (row.values && row.values[0] && row.values[0].length === 2) {
-            const [key, value] = row.values[0];
-
-            if (!categories[key]) {
-                categories[key] = [];
-            }
-            categories[key].push(value);
-        }
-    });
-
-    // Return arrays in a fixed order: [Plant Items, Employees]
-    return [categories["Plant Items"] || [], categories["Employees"] || [], categories["Sites"] || [], categories["Foremen"] || [] ];
+  }
 }
 
 async function init() {
-  getAccount();
-  setToday();
-  getWeatherDescription();
-}
 
-init();
+  const params = new URLSearchParams(window.location.search);
+  const thisSite = params.get('site') || 'JSBHQ';
+
+  
+  token = await getAuth();
+  const [users, employees, plant] = await getCompanyData(token.accessToken);
+  await getWeatherDescription();
+
+  addEmployees(employees)
+  addPlant(plant)
+  addSites(thisSite, [])
+  addUsers(token.account.name , users)
+  setToday();
+
+  loading = false;
+  updateLoadingDisplay();
+}
 
 function addEmployeeRow() {
   const table = document.getElementById("employeeTable");
@@ -369,6 +338,9 @@ window.onclick = function(event) {
 }
 
 async function submitForm() {
+    loading = true;
+    updateLoadingDisplay();
+
     // --- Main info ---
     const name = document.getElementById("nameInput").value || "";
     const site = document.getElementById("siteInput").value || "";
@@ -377,9 +349,8 @@ async function submitForm() {
     const date = dateValue ? new Date(dateValue).getTime() / (1000*60*60*24) : "";
     const log = document.getElementById("notesInput").value || "";
 
-    // --- Employees (max 5) ---
+    // --- Employees ---
     const employeeRows = [...document.querySelectorAll("#employeeTable tr")].slice(1)
-        .slice(0, 5) // only take first 5
         .map(row => {
             const cells = row.children;
             const nameInput = cells[0].querySelector("input") || cells[0].querySelector("select");
@@ -389,20 +360,11 @@ async function submitForm() {
             const timeOut = timeOutInput ? timeToExcelFraction(timeOutInput.value) : "";
             const descInput = cells[3].querySelector(".work-desc-input");
             const desc = descInput ? descInput.value : "";
-            return [nameInput ? nameInput.value : "", timeIn, timeOut, desc];
+            return [date, nameInput ? nameInput.value : "", timeIn, timeOut, desc];
         });
 
-    // Pad to 5 employees
-    while (employeeRows.length < 5) {
-        employeeRows.push(["", "", "", ""]);
-    }
-
-    // Flatten employees
-    const flatEmployees = employeeRows.flat();
-
-    // --- Subcontractors (max 5) ---
+    // --- Subcontractors ---
     const subRows = [...document.querySelectorAll("#subTable tr")].slice(1)
-        .slice(0, 5)
         .map(row => {
             const cells = row.children;
             const nameInput = cells[0].querySelector(".sub-name-input");
@@ -413,21 +375,53 @@ async function submitForm() {
             const timeOut = timeOutInput ? timeToExcelFraction(timeOutInput.value) : "";
             const descInput = cells[3].querySelector(".work-desc-input");
             const desc = descInput ? descInput.value : "";
-            return [name, timeIn, timeOut, desc];
+            return [date, name, timeIn, timeOut, desc];
         });
 
-    // Pad to 5 subcontractors
-    while (subRows.length < 5) {
-        subRows.push(["", "", "", ""]);
+     // --- Plant/Equipment ---
+     const plantRows = [...document.querySelectorAll("#plantTable tr")].slice(1)
+      .map(row => {
+          const cells = row.children;
+          const nameSelect = cells[0].querySelector("select");
+          const name = nameSelect ? nameSelect.value : "";
+          const descInput = cells[1].querySelector(".work-desc-input");
+          const desc = descInput ? descInput.value : "";
+          return [date, name, desc];
+      })
+      .filter(row => row[1]); // Only include rows where plant name is selected
+
+
+    // Validation: Check if notesInput has content and at least 1 employee row with a name
+    const hasNotes = log.trim().length > 0;
+    const validEmployeeRows = employeeRows.filter(row => row[1] && row[1].trim().length > 0);
+    const hasEmployees = validEmployeeRows.length > 0;
+
+    if (!hasNotes) {
+      alert("Please enter notes describing the works completed today.");
+      return;
     }
 
-    // Flatten subcontractors
-    const flatSubs = subRows.flat();
+    if (!hasEmployees) {
+      alert("Please add at least one employee with a name selected to the form.");
+      return;
+    }
 
-    // --- Combine everything into a single row ---
-    const fullRow = [name, date, site, weather, log, ...flatEmployees, ...flatSubs];
+    const details = [name, date, site, weather, log]
 
-    await addRowsToTable("Table1", [fullRow]);
+    try {
+      await postForm(site, token.accessToken, details, subRows, employeeRows, plantRows);
+      // Success - close the tab after a brief delay
+      // setTimeout(() => {
+      //   window.close();
+      // }, 500);
+    } catch (error) {
+      console.error("Error posting data: ", error)
+      alert("Error submitting form. Please try again.");
+    } finally {
+      loading = false;
+      updateLoadingDisplay();
+    }
+
 }
 
 // --- Helper: convert HH:MM to Excel fraction ---
@@ -435,35 +429,6 @@ function timeToExcelFraction(timeStr) {
     if(!timeStr) return 0;
     const [h, m] = timeStr.split(":").map(Number);
     return (h + m/60) / 24;
-}
-
-
-// --- Function to add rows to a table ---
-async function addRowsToTable(tableName, payload) {
-    const filePath = '/Data.xlsx'
-    const token = await getAccessToken();
-
-    const otherUser = "admin@jamessamuelsbuilder.com.au"; // or user ID
-    const fileName = "Data.xlsx";
-    const tableId = "Table1";
-
-    const url = `https://graph.microsoft.com/v1.0/users('${otherUser}')/drive/root:/${fileName}:/workbook/tables('${tableId}')/rows/add`;
-
-    console.log("Posting Request With Data: ", payload)
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ values: payload })
-    });
-    console.log("Posting Done: ", res)
-    if (!res.ok) {
-        const err = await res.json();
-        console.error(`Error adding to ${tableName}:`, err);
-        alert(`Error adding to ${tableName}`);
-    }
 }
 
 // Convert HH:MM to Excel fraction
@@ -609,6 +574,9 @@ async function fetchWeatherByCoordinates(latitude, longitude) {
 // Update weather when page loads and when site changes
 document.addEventListener("DOMContentLoaded", () => {
   // Time cells are now handled via onclick handlers in the HTML
+  // Initialize loading display
+  updateLoadingDisplay();
 });
 
 
+init();
