@@ -26,7 +26,9 @@ function addUsers(thisUser, users) {
 }
 
 function addSites(thisSite, sites) {
-  sites = [thisSite]
+  if (!sites.includes(thisSite)) {
+    thisSite = sites[0]
+  }
   // Get the select element
   const siteSelect = document.getElementById("siteInput");
 
@@ -71,12 +73,12 @@ async function init() {
 
   
   token = await getAuth();
-  const [users, employees, plant] = await getCompanyData(token.accessToken);
+  const [users, employees, plant, sites] = await getCompanyData(token.accessToken);
   await getWeatherDescription();
 
   addEmployees(employees)
   addPlant(plant)
-  addSites(thisSite, [])
+  addSites(thisSite, sites)
   addUsers(token.account.name , users)
   setToday();
 

@@ -19,6 +19,20 @@ async function getUsers(token) {
   return rows;
 }
 
+async function getSites(token) {
+  const url = `${onedrive_root}/Company/CompanyData.xlsx:/workbook/tables/Sites/columns/Name`;
+  const response =  await fetch(url, {
+      method: "GET",
+      headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+      }
+  });
+  const data = await response.json();
+  const rows = data.values.flat().slice(1)
+  return rows;
+}
+
 
 async function getEmployees(token) {
   const url = `${onedrive_root}/Company/CompanyData.xlsx:/workbook/tables/Emp_Table/columns/Name`;
@@ -56,8 +70,11 @@ async function getCompanyData(token){
 
     const employees = await getEmployees(token);
 
-    const plant = await getPlant(token);    
-    return [me, employees, plant];
+    const plant = await getPlant(token);
+
+    const sites = await getSites(token);    
+    
+    return [me, employees, plant, sites];
 
   } catch (err) {
       console.error(err);
