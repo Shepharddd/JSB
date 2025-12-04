@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Daily Site Log</title>
-    <link rel="stylesheet" href="site-form.css" />
-    <link rel="icon" href="favicon.webp" type="image/webp">
+    <link rel="stylesheet" href="css/site-form.css" />
+    <link rel="icon" href="assets/favicon.webp" type="image/webp">
   </head>
   <body>
     <!-- Loading Overlay -->
@@ -13,15 +13,17 @@
       <div class="loading-spinner"></div>
       <p class="loading-text">Loading...</p>
     </div>
-    <!-- <p id="loginStatus"></p> -->
-    <div class="section">
-      
-        <div class="two-col">
 
-        <img src="JSBLogo.jpg" alt="Picture" style="max-height: 150px; max-width: 50%; aspect-ratio: 4;" />
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+      <span id="toastMessage">Form submitted successfully!</span>
+    </div>
+
+    <div class="section">
+      <div class="two-col">
+        <img src="assets/JSBLogo.jpg" alt="JSB Logo" style="max-height: 150px; max-width: 50%; aspect-ratio: 4;" />
 
         <div class="input-container">
-
           <div class="input-row">
             <label>Name:</label>
             <select id="nameInput">
@@ -48,20 +50,15 @@
         </div>
       </div>
 
-
       <div class="notes-container">
         <textarea id="notesInput" rows="5" placeholder="Describe the works completed today..."></textarea>
-        <!-- <button class="submit-btn" onclick="submitForm()">Submit Form</button> -->
       </div>
-
-
     </div>
-
 
     <div class="section">
       <div class="section-header">
         <h2>Employees</h2>
-        <button class="add-btn" onclick="addEmployeeRow()">Add</button>
+        <button id="addEmployeeBtn" class="add-btn">Add</button>
       </div>
       <table id="employeeTable">
         <tr>
@@ -72,14 +69,12 @@
           <th>Delete</th>
         </tr>
       </table>
-      <!-- <button class="add-btn" onclick="addEmployeeRow()">Add Employee</button> -->
     </div>
-
 
     <div class="section">
       <div class="section-header">
         <h2>Subcontractors</h2>
-        <button class="add-btn" onclick="addSubRow()">Add</button>
+        <button id="addSubBtn" class="add-btn">Add</button>
       </div>
       <table id="subTable">
         <tr>
@@ -95,11 +90,10 @@
     <div class="section">
       <div class="section-header">
         <h2>Plant/Equipment</h2>
-        <button class="add-btn" onclick="addPlantRow()">Add</button>
+        <button id="addPlantBtn" class="add-btn">Add</button>
       </div>
       <table id="plantTable">
         <tr>
-          <!-- <th>Has Used</th> -->
           <th>Name</th>
           <th>Tasks</th>
           <th>Delete</th>
@@ -108,7 +102,7 @@
     </div>
 
     <div class="section">
-      <button class="submit-btn" onclick="submitForm()">Submit</button>
+      <button id="submitBtn" class="submit-btn">Submit</button>
     </div>
 
     <!-- Work Description Popup Modal -->
@@ -116,14 +110,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>Work Description</h3>
-          <span class="modal-close" onclick="closeWorkDescModal()">&times;</span>
+          <span class="modal-close" data-action="close-work-desc">&times;</span>
         </div>
         <div class="modal-body">
           <textarea id="workDescTextarea" rows="6" placeholder="Enter work description..."></textarea>
         </div>
         <div class="modal-footer">
-          <button class="modal-btn" onclick="saveWorkDescription()">Save</button>
-          <button class="modal-btn modal-btn-cancel" onclick="closeWorkDescModal()">Cancel</button>
+          <button class="modal-btn" data-action="save-work-desc">Save</button>
+          <button class="modal-btn modal-btn-cancel" data-action="close-work-desc">Cancel</button>
         </div>
       </div>
     </div>
@@ -133,14 +127,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3 id="timeModalTitle">Time</h3>
-          <span class="modal-close" onclick="closeTimeModal()">&times;</span>
+          <span class="modal-close" data-action="close-time">&times;</span>
         </div>
         <div class="modal-body">
           <input type="time" id="timeInput" style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;" />
         </div>
         <div class="modal-footer">
-          <button class="modal-btn" onclick="saveTime()">Save</button>
-          <button class="modal-btn modal-btn-cancel" onclick="closeTimeModal()">Cancel</button>
+          <button class="modal-btn" data-action="save-time">Save</button>
+          <button class="modal-btn modal-btn-cancel" data-action="close-time">Cancel</button>
         </div>
       </div>
     </div>
@@ -150,21 +144,29 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>Subcontractor Name</h3>
-          <span class="modal-close" onclick="closeSubNameModal()">&times;</span>
+          <span class="modal-close" data-action="close-sub-name">&times;</span>
         </div>
         <div class="modal-body">
           <input type="text" id="subNameInput" placeholder="Enter subcontractor name..." style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;" />
         </div>
         <div class="modal-footer">
-          <button class="modal-btn" onclick="saveSubName()">Save</button>
-          <button class="modal-btn modal-btn-cancel" onclick="closeSubNameModal()">Cancel</button>
+          <button class="modal-btn" data-action="save-sub-name">Save</button>
+          <button class="modal-btn modal-btn-cancel" data-action="close-sub-name">Cancel</button>
         </div>
       </div>
     </div>
 
+    <!-- Scripts - Load in order: config first, then dependencies, then app -->
     <script src="https://alcdn.msauth.net/browser/2.32.2/js/msal-browser.min.js"></script>
-    <script src="graph-api.js"></script>
-    <script src="auth.js"></script>
-    <script src="site-form.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/ui-utils.js"></script>
+    <script src="js/form-data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/graph-api.js"></script>
+    <script src="js/weather-api.js"></script>
+    <script src="js/modal-handler.js"></script>
+    <script src="js/table-handler.js"></script>
+    <script src="js/form-handler.js"></script>
+    <script src="js/app.js"></script>
   </body>
 </html>
