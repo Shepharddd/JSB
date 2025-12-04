@@ -247,7 +247,7 @@ async function postPlant(token, url, plant) {
  */
 async function postForm(project, token, details, subs, emps, plant) {
   try {
-    const timesheet_url = `${GRAPH_API.ONEDRIVE_ROOT}/Projects/${project}/TimeSheets/TimeSheets.xlsx:/workbook`;
+    const timesheet_url = `${GRAPH_API.ONEDRIVE_ROOT}/Data/TimeSheets.xlsx:/workbook`;
     
     // Post all data in parallel where possible
     const promises = [postDetails(token, timesheet_url, details)];
