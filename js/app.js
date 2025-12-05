@@ -12,24 +12,30 @@ async function init() {
   try {
     // Get site from URL parameters
     const params = new URLSearchParams(window.location.search);
-    const thisSite = params.get('site') || CONFIG.DEFAULTS.SITE;
+    const siteParam = params.get('site');
+    const thisSite = siteParam || CONFIG.DEFAULTS.SITE;
+    const hasSiteParam = !!siteParam;
 
     // Authenticate
-    const [graphToken, flowToken] = await getAuth();
-    setTokens(graphToken, flowToken);
+    const flowToken = await getAuth();
+    setToken(flowToken);
 
     // Load company data
-    const [users, plant, sites] = await getCompanyData(flowToken);
+    const [users, plant, sites, admins] = await getCompanyData(flowToken);
     
     // Update application state
     setEmployees(users);
     setPlant(plant);
     setSites(sites);
 
+    // Check if current user is an admin
+    const currentUserName = flowToken.account.name;
+    const isAdmin = admins && admins.includes(currentUserName);
+
     // Populate form fields
-    populateSites(thisSite, sites);
-    populateUsers(graphToken.account.name, users);
-    setToday();
+    populateSites(thisSite, sites, hasSiteParam);
+    populateUsers(currentUserName, users, isAdmin);
+    // Date navigation is initialized separately in initializeApp()
 
     // Load weather
     await getWeatherDescription();
@@ -38,6 +44,7 @@ async function init() {
     console.error("Error initializing application:", error);
     const errorMessage = error.message || CONFIG.TOAST.ERROR_MESSAGES.LOAD_ERROR;
     showToast(errorMessage, "error");
+    throw error;
   } finally {
     setLoading(false);
   }
@@ -55,6 +62,14 @@ function initializeApp() {
   
   // Initialize form handler
   initFormHandler();
+  
+  // Initialize Lucide icons
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+  
+  // Initialize date navigation
+  initDateNavigation();
   
   // Initialize application
   init();

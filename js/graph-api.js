@@ -6,7 +6,6 @@
  */
 async function getCompanyData(token) {
   try {
-
     const url = `https://default68237f8abf3c425bb92b9518c6d4bf.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/309d786d9292408bad9e028106830362/triggers/manual/paths/invoke?api-version=1`;
     const response = await fetch(url, {
       method: "POST",
@@ -15,9 +14,15 @@ async function getCompanyData(token) {
         "Content-Type": "application/json"
       }
     });
-    data = await response.json()
     
-    return [[...data.Managers, ...data.Admins], data.Plants, data.Projects];
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Failed to fetch company data: ${response.status} ${response.statusText}. ${errorData.error?.message || ''}`);
+    }
+    
+    const data = await response.json();
+    
+    return [[...data.Managers, ...data.Admins], data.Plants, data.Projects, data.Admins || []];
   } catch (err) {
     console.error("Error reading company data:", err);
     throw new Error(`Failed to load company data: ${err.message}`);
@@ -33,7 +38,7 @@ async function getCompanyData(token) {
 async function postForm(json, token) {
   try {
     const url = `https://default68237f8abf3c425bb92b9518c6d4bf.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/79ae499d08c640178282b660cd060fd6/triggers/manual/paths/invoke?api-version=1`;
-    await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -41,6 +46,11 @@ async function postForm(json, token) {
       },
       body: json
     });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Failed to post form: ${response.status} ${response.statusText}. ${errorData.error?.message || ''}`);
+    }
   } catch (err) {
     console.error("Error posting form data:", err);
     throw new Error(`Failed to submit form: ${err.message}`);

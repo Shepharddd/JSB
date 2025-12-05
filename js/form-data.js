@@ -5,7 +5,6 @@
 
 // Application state
 const AppState = {
-  graphToken: null,
   flowToken: null,
   employees: [],
   plant: [],
@@ -65,17 +64,8 @@ function getSites() {
  * Sets the authentication token
  * @param {Object} tokenData - The token object
  */
-function setTokens(graphToken, flowToken) {
-  AppState.graphToken = graphToken;
+function setToken(flowToken) {
   AppState.flowToken = flowToken;
-}
-
-/**
- * Gets the authentication graph token
- * @returns {Object|null} The token object or null
- */
-function getGraphToken() {
-  return AppState.graphToken;
 }
 
 /**
@@ -90,8 +80,9 @@ function getFlowToken() {
  * Populates the users dropdown
  * @param {string} thisUser - The current user's name
  * @param {Array} users - Array of user names
+ * @param {boolean} isAdmin - Whether the current user is an admin
  */
-function populateUsers(thisUser, users) {
+function populateUsers(thisUser, users, isAdmin = false) {
   const nameSelect = getElementById("nameInput");
   if (!nameSelect) return;
 
@@ -109,14 +100,18 @@ function populateUsers(thisUser, users) {
   });
   
   nameSelect.value = thisUser;
+  
+  // Disable the input if user is not an admin
+  nameSelect.disabled = !isAdmin;
 }
 
 /**
  * Populates the sites dropdown
  * @param {string} thisSite - The current site name
  * @param {Array} sites - Array of site names
+ * @param {boolean} disable - Whether to disable the site input (if site comes from URL param)
  */
-function populateSites(thisSite, sites) {
+function populateSites(thisSite, sites, disable = false) {
   const siteSelect = getElementById("siteInput");
   if (!siteSelect) return;
 
@@ -139,5 +134,8 @@ function populateSites(thisSite, sites) {
   });
   
   siteSelect.value = thisSite;
+  
+  // Disable the input if site parameter was provided in URL
+  siteSelect.disabled = disable;
 }
 

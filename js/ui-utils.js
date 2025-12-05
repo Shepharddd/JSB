@@ -44,14 +44,12 @@ function showToast(message = CONFIG.TOAST.SUCCESS_MESSAGE, type = "success") {
 }
 
 /**
- * Sets the date input to today's date
+ * Sets the date to today's date
  */
 function setToday() {
-  const today = new Date().toISOString().split("T")[0];
-  const dateInput = document.getElementById("dateInput");
-  if (dateInput) {
-    dateInput.value = today;
-  }
+  // Date navigation is handled by date-navigation.js
+  // This function is kept for compatibility but does nothing
+  // as initializeDateNavigation() is called separately
 }
 
 /**

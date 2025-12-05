@@ -5,17 +5,37 @@
 
 /**
  * Initializes MSAL instance with configuration
+ * @returns {Object} The MSAL instance
  */
-const msalInstance = new msal.PublicClientApplication({
-  auth: {
-    clientId: CONFIG.MSAL.CLIENT_ID,
-    authority: CONFIG.MSAL.AUTHORITY,
-    redirectUri: CONFIG.MSAL.REDIRECT_URI
-  },
-  system: {
-    navigateToLoginRequestUrl: false
+function getMsalInstance() {
+  if (typeof msal === 'undefined') {
+    throw new Error('MSAL library not loaded. Please ensure msal-browser.min.js is loaded before auth.js');
   }
-});
+  
+  if (typeof CONFIG === 'undefined') {
+    throw new Error('CONFIG not loaded. Please ensure config.js is loaded before auth.js');
+  }
+
+  return new msal.PublicClientApplication({
+    auth: {
+      clientId: CONFIG.MSAL.CLIENT_ID,
+      authority: CONFIG.MSAL.AUTHORITY,
+      redirectUri: CONFIG.MSAL.REDIRECT_URI
+    },
+    system: {
+      navigateToLoginRequestUrl: false
+    }
+  });
+}
+
+// Initialize MSAL instance
+let msalInstance;
+try {
+  msalInstance = getMsalInstance();
+} catch (error) {
+  console.error('Failed to initialize MSAL instance:', error);
+  // Will be retried when getAuth is called
+}
 /**
  * Retrieves an access token for the given account
  * @param {Object} account - The MSAL account object
@@ -28,28 +48,33 @@ async function getAccessToken(account) {
     throw new Error("No account provided");
   }
 
-  const graphToken = await msalInstance.acquireTokenSilent({
-    scopes: CONFIG.MSAL.GRAPH_SCOPES,
-    account: account,
-  });
-
   const flowToken = await msalInstance.acquireTokenSilent({
     scopes: CONFIG.MSAL.FLOW_SCOPES,
     account: account,
   });
 
-  if (!graphToken || !flowToken) {
+  if (!flowToken) {
     throw new Error("No access token available");
   }
-  console.log("Graph Token: ", graphToken);
-  return [graphToken, flowToken];
+
+  return flowToken;
 }
 
 /**
  * Handles authentication flow
- * @returns {Promise<Object>} The token object
+ * @returns {Promise<Object>} The flow token object
  */
 async function getAuth() {
+  // Ensure MSAL instance is initialized
+  if (!msalInstance) {
+    try {
+      msalInstance = getMsalInstance();
+    } catch (error) {
+      console.error('Failed to initialize MSAL:', error);
+      throw new Error('Authentication system not available. Please refresh the page.');
+    }
+  }
+
   // Step 1 — Check if this load is returning from redirect login
   const result = await msalInstance.handleRedirectPromise();
 
@@ -68,6 +93,9 @@ async function getAuth() {
 
   // Step 3 — No user signed in → start login
   console.log("No user logged in → redirecting…");
-  msalInstance.loginRedirect();
+  const loginRequest = {
+    scopes: CONFIG.MSAL.FLOW_SCOPES
+  };
+  await msalInstance.loginRedirect(loginRequest);
 }
 

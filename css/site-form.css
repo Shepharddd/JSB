@@ -4,6 +4,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 20px;
   background: #f4f4f4;
+  -webkit-tap-highlight-color: transparent;
 }
 .section {
   display: flex;
@@ -65,6 +66,65 @@ body {
   border: none;
   background: transparent;
   text-align: right;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Date Navigation */
+.date-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  width: 100%;
+  /* max-width: 250px; */
+}
+
+.date-nav-btn {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.date-nav-btn:hover:not(.disabled) {
+  background: #f0f0f0;
+  border-color: #999;
+}
+
+.date-nav-btn:active:not(.disabled) {
+  background: #e0e0e0;
+}
+
+.date-nav-btn.disabled,
+.date-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent;
+}
+
+.date-nav-btn i {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+.date-display {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  padding: 4px 8px;
+  min-width: 150px;
 }
 .input-row input:focus,
 .input-row select:focus {
@@ -91,6 +151,21 @@ body {
     max-width: 100% !important;
     width: 100%;
   }
+  
+  .date-navigation {
+    max-width: 100%;
+  }
+  
+  .date-display {
+    font-size: 12px;
+    min-width: 120px;
+  }
+  
+  .date-nav-btn {
+    width: 28px;
+    height: 28px;
+    padding: 4px 8px;
+  }
 }
 
 
@@ -104,6 +179,7 @@ table {
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   background: white;
+  table-layout: fixed;
 }
 th {
   background: #002512;
@@ -191,16 +267,17 @@ td {
 #plantTable td:last-child {
   text-align: center;
 }
-/* Make delete columns smaller */
+/* Make delete columns match button width */
 #employeeTable th:last-child,
 #employeeTable td:last-child,
 #subTable th:last-child,
 #subTable td:last-child,
 #plantTable th:last-child,
 #plantTable td:last-child {
-  width: 80px;
-  min-width: 80px;
-  max-width: 80px;
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  padding: 8px 4px;
 }
 tr:last-child td:first-child {
   border-bottom-left-radius: 8px;
@@ -234,6 +311,9 @@ table select {
   border-radius: 0;
   background: transparent;
   font-size: 14px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 table select:focus {
   outline: none;
@@ -262,12 +342,23 @@ table .delete-btn {
   background: #dc3545;
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 0;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 16px;
+  line-height: 1;
   transition: background-color 0.2s ease, transform 0.1s ease;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+table .delete-btn i {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
 }
 table .delete-btn:hover {
   background: #c82333;
@@ -320,32 +411,39 @@ input, textarea {
     padding: 8px 12px;
   }
   table {
-    font-size: 11px;
+    font-size: 13px;
   }
   th {
-    font-size: 10px;
-    padding: 8px 6px;
+    font-size: 12px;
+    padding: 12px 8px;
     letter-spacing: 0.3px;
   }
   td {
-    padding: 6px 4px;
-    font-size: 11px;
+    padding: 10px 8px;
+    font-size: 13px;
+    line-height: 1.4;
   }
   table input[type="text"] {
     all: unset;
     width: 100%;
   }
   table select {
-    font-size: 10px;
-    padding: 0;
+    font-size: 13px;
+    padding: 4px 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
   table input[type="time"] {
     all: unset;
     width: 100%;
+    font-size: 13px;
   }
   table .delete-btn {
-    font-size: 9px;
-    padding: 3px 6px;
+    font-size: 16px;
+    padding: 6px 10px;
+    width: 32px;
+    height: 32px;
   }
 
   #employeeTable th:first-child,
@@ -354,9 +452,9 @@ input, textarea {
   #plantTable td:first-child,
   #subTable th:first-child,
   #subTable td:first-child {
-    width: 90px;
-    min-width: 90px;
-    max-width: 90px;
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
   }
 
   /* Make Time In and Time Out columns smaller on mobile */
@@ -368,21 +466,30 @@ input, textarea {
   #subTable th:nth-child(3),
   #subTable td:nth-child(2),
   #subTable td:nth-child(3) {
-    width: 60px;
-    min-width: 60px;
-    max-width: 60px;
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
   }
 
-  /* Make delete columns smaller */
+  /* Make delete columns match button width */
   #employeeTable th:last-child,
   #employeeTable td:last-child,
   #subTable th:last-child,
   #subTable td:last-child,
   #plantTable th:last-child,
   #plantTable td:last-child {
-    width: 50px;
-    min-width: 50px;
-    max-width: 50px;
+    width: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    padding: 8px 4px;
+  }
+
+  /* Improve readability for work description cells on mobile */
+  .work-desc-cell,
+  .time-cell,
+  .sub-name-cell {
+    padding: 10px 8px;
+    min-height: 32px;
   }
 }
 
@@ -391,35 +498,42 @@ input, textarea {
     font-size: 16px;
   }
   .add-btn {
-    font-size: 11px;
-    padding: 6px 10px;
+    font-size: 12px;
+    padding: 8px 12px;
   }
   table {
-    font-size: 10px;
+    font-size: 12px;
   }
   th {
-    font-size: 9px;
-    padding: 6px 4px;
+    font-size: 11px;
+    padding: 10px 6px;
   }
   td {
-    padding: 5px 3px;
-    font-size: 10px;
+    padding: 8px 6px;
+    font-size: 12px;
+    line-height: 1.5;
   }
   table input[type="text"] {
     all: unset;
     width: 100%;
   }
   table select {
-    font-size: 9px;
-    padding: 0;
+    font-size: 12px;
+    padding: 4px 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
   table input[type="time"] {
     all: unset;
     width: 100%;
+    font-size: 12px;
   }
   table .delete-btn {
-    font-size: 8px;
-    padding: 2px 2px;
+    font-size: 14px;
+    padding: 6px 8px;
+    width: 28px;
+    height: 28px;
   }
 
   #employeeTable th:first-child,
@@ -428,9 +542,9 @@ input, textarea {
   #plantTable td:first-child,
   #subTable th:first-child,
   #subTable td:first-child {
-    width: 50px;
-    min-width: 50px;
-    max-width: 50px;
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
   }
 
   /* Make Time In and Time Out columns even smaller on small mobile */
@@ -442,20 +556,29 @@ input, textarea {
   #subTable th:nth-child(3),
   #subTable td:nth-child(2),
   #subTable td:nth-child(3) {
-    width: 40px;
-    min-width: 40px;
-    max-width: 40px;
+    width: 45px;
+    min-width: 45px;
+    max-width: 45px;
   }
-  /* Make delete columns smaller */
+  /* Make delete columns match button width */
   #employeeTable th:last-child,
   #employeeTable td:last-child,
   #subTable th:last-child,
   #subTable td:last-child,
   #plantTable th:last-child,
   #plantTable td:last-child {
-    width: 40px;
-    min-width: 40px;
-    max-width: 40px;
+    width: 28px;
+    min-width: 28px;
+    max-width: 28px;
+    padding: 8px 4px;
+  }
+
+  /* Improve readability for work description cells on small mobile */
+  .work-desc-cell,
+  .time-cell,
+  .sub-name-cell {
+    padding: 8px 6px;
+    min-height: 32px;
   }
 }
 
@@ -564,6 +687,32 @@ input, textarea {
   padding: 8px;
   min-height: 20px;
   position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.work-desc-cell:active,
+.work-desc-cell:focus {
+  outline: none;
+  background-color: #f0f0f0;
+}
+
+/* Constrain work description columns to prevent expansion */
+#employeeTable th:nth-child(4),
+#employeeTable td:nth-child(4),
+#subTable th:nth-child(4),
+#subTable td:nth-child(4),
+#plantTable th:nth-child(2),
+#plantTable td:nth-child(2) {
+  max-width: 300px;
+  overflow: hidden;
 }
 
 .work-desc-cell:hover {
@@ -576,6 +725,16 @@ input, textarea {
   padding: 8px;
   min-height: 20px;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.time-cell:active,
+.time-cell:focus {
+  outline: none;
+  background-color: #f0f0f0;
 }
 
 .time-cell:hover {
@@ -588,6 +747,16 @@ input, textarea {
   padding: 8px;
   min-height: 20px;
   position: relative;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.sub-name-cell:active,
+.sub-name-cell:focus {
+  outline: none;
+  background-color: #f0f0f0;
 }
 
 .sub-name-cell:hover {
@@ -611,11 +780,16 @@ input, textarea {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+  width: 100%;
 }
 
 .work-desc-display.empty {
   color: #999;
   font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .work-desc-input {

@@ -40,8 +40,13 @@ function addEmployeeRow() {
       <span class="work-desc-display empty">Click to add description</span>
       <input type="hidden" class="work-desc-input" value="" />
     </td>
-    <td><button class="delete-btn" data-action="delete">Delete</button></td>
+    <td><button class="delete-btn" data-action="delete" aria-label="Delete"><i data-lucide="trash-2"></i></button></td>
   `;
+
+  // Initialize Lucide icons in the new row
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
 }
 
 /**
@@ -72,8 +77,13 @@ function addSubRow() {
       <span class="work-desc-display empty">Click to add description</span>
       <input type="hidden" class="work-desc-input" value="" />
     </td>
-    <td><button class="delete-btn" data-action="delete">Delete</button></td>
+    <td><button class="delete-btn" data-action="delete" aria-label="Delete"><i data-lucide="trash-2"></i></button></td>
   `;
+
+  // Initialize Lucide icons in the new row
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
 }
 
 /**
@@ -100,8 +110,13 @@ function addPlantRow() {
       <span class="work-desc-display empty">Click to add description</span>
       <input type="hidden" class="work-desc-input" value="" />
     </td>
-    <td><button class="delete-btn" data-action="delete">Delete</button></td>
+    <td><button class="delete-btn" data-action="delete" aria-label="Delete"><i data-lucide="trash-2"></i></button></td>
   `;
+
+  // Initialize Lucide icons in the new row
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
 }
 
 /**
