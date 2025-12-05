@@ -30,9 +30,13 @@ function collectEmployeeRows(date) {
       const timeOut = timeOutInput ? timeToExcelFraction(timeOutInput.value) : "";
       const descInput = cells[3].querySelector(".work-desc-input");
       const desc = descInput ? descInput.value : "";
-      return [date, nameInput ? nameInput.value : "", timeIn, timeOut, desc];
+      return {
+        name: nameInput ? nameInput.value : "",
+        timeIn: timeIn,
+        timeOut: timeOut,
+        desc: desc,
+      };
     });
-  
   return employeeRows;
 }
 
@@ -53,9 +57,13 @@ function collectSubcontractorRows(date) {
       const timeOut = timeOutInput ? timeToExcelFraction(timeOutInput.value) : "";
       const descInput = cells[3].querySelector(".work-desc-input");
       const desc = descInput ? descInput.value : "";
-      return [date, name, timeIn, timeOut, desc];
+      return {
+        name: name,
+        timeIn: timeIn,
+        timeOut: timeOut,
+        desc: desc,
+      };
     });
-  
   return subRows;
 }
 
@@ -72,9 +80,12 @@ function collectPlantRows(date) {
       const name = nameSelect ? nameSelect.value : "";
       const descInput = cells[1].querySelector(".work-desc-input");
       const desc = descInput ? descInput.value : "";
-      return [date, name, desc];
+      return {
+        name: name,
+        desc: desc,
+      };
     })
-    .filter(row => row[1]); // Only include rows where plant name is selected
+    .filter(row => row.name); // Only include rows where plant name is selected
   
   return plantRows;
 }
@@ -121,7 +132,8 @@ function clearTableRows(tableId) {
  */
 function validateForm(log, employeeRows) {
   const hasNotes = log.trim().length > 0;
-  const validEmployeeRows = employeeRows.filter(row => row[1] && row[1].trim().length > 0);
+  const validEmployeeRows = employeeRows.filter(row => row.name && row.name.trim().length > 0);
+  console.log(validEmployeeRows)
   const hasEmployees = validEmployeeRows.length > 0;
 
   if (!hasNotes) {
@@ -179,15 +191,32 @@ async function submitForm() {
       return;
     }
 
+    // Transform into a single JSON object
+    const resultJSON = {
+        name: name,
+        site: site,
+        weather: weather,
+        date: date,
+        log: log,
+        employees: employeeRows,
+        subcontractors: subRows,
+        plants: plantRows
+    };
+
+    // If you need a JSON string:
+    const resultJSONString = JSON.stringify(resultJSON);
+
+
+
     const details = [name, date, site, weather, log];
-    const token = getToken();
+    const token = getFlowToken();
 
     if (!token || !token.accessToken) {
       throw new Error("Authentication token not available");
     }
 
     // Submit form
-    await postForm(site, token.accessToken, details, subRows, employeeRows, plantRows);
+    await postForm(resultJSONString, token.accessToken);
     
     // Clear form after successful submission
     clearFormData();

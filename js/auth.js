@@ -28,15 +28,21 @@ async function getAccessToken(account) {
     throw new Error("No account provided");
   }
 
-  const token = await msalInstance.acquireTokenSilent({
-    scopes: CONFIG.MSAL.SCOPES,
+  const graphToken = await msalInstance.acquireTokenSilent({
+    scopes: CONFIG.MSAL.GRAPH_SCOPES,
     account: account,
   });
 
-  if (!token) {
+  const flowToken = await msalInstance.acquireTokenSilent({
+    scopes: CONFIG.MSAL.FLOW_SCOPES,
+    account: account,
+  });
+
+  if (!graphToken || !flowToken) {
     throw new Error("No access token available");
   }
-  return token;
+  console.log("Graph Token: ", graphToken);
+  return [graphToken, flowToken];
 }
 
 /**

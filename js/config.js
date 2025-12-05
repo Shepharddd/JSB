@@ -11,7 +11,8 @@ const CONFIG = {
     REDIRECT_URI: window.location.hostname === 'localhost' 
       ? "http://localhost:8000/" 
       : "https://timesheets.jamessamuelsbuilder.com.au/",
-    SCOPES: ["Files.ReadWrite.All", "Sites.ReadWrite.All", "User.ReadBasic.All", "Directory.Read.All"]
+    GRAPH_SCOPES: ["https://graph.microsoft.com/.default"],
+    FLOW_SCOPES: ["https://service.flow.microsoft.com//.default"]
   },
 
   // Graph API

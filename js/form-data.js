@@ -5,7 +5,8 @@
 
 // Application state
 const AppState = {
-  token: null,
+  graphToken: null,
+  flowToken: null,
   employees: [],
   plant: [],
   sites: [],
@@ -64,16 +65,25 @@ function getSites() {
  * Sets the authentication token
  * @param {Object} tokenData - The token object
  */
-function setToken(tokenData) {
-  AppState.token = tokenData;
+function setTokens(graphToken, flowToken) {
+  AppState.graphToken = graphToken;
+  AppState.flowToken = flowToken;
 }
 
 /**
- * Gets the authentication token
+ * Gets the authentication graph token
  * @returns {Object|null} The token object or null
  */
-function getToken() {
-  return AppState.token;
+function getGraphToken() {
+  return AppState.graphToken;
+}
+
+/**
+ * Gets the authentication flow token
+ * @returns {Object|null} The token object or null
+ */
+function getFlowToken() {
+  return AppState.flowToken;
 }
 
 /**

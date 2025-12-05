@@ -15,20 +15,20 @@ async function init() {
     const thisSite = params.get('site') || CONFIG.DEFAULTS.SITE;
 
     // Authenticate
-    const token = await getAuth();
-    setToken(token);
+    const [graphToken, flowToken] = await getAuth();
+    setTokens(graphToken, flowToken);
 
     // Load company data
-    const [users, employees, plant, sites] = await getCompanyData(token.accessToken);
+    const [users, plant, sites] = await getCompanyData(flowToken);
     
     // Update application state
-    setEmployees(employees);
+    setEmployees(users);
     setPlant(plant);
     setSites(sites);
 
     // Populate form fields
     populateSites(thisSite, sites);
-    populateUsers(token.account.name, users);
+    populateUsers(graphToken.account.name, users);
     setToday();
 
     // Load weather
