@@ -73,6 +73,11 @@ function saveTime() {
   }
   
   closeTimeModal();
+  
+  // Auto-save form data when time is saved
+  if (typeof autoSaveFormData === 'function') {
+    autoSaveFormData();
+  }
 }
 
 /**
@@ -139,6 +144,11 @@ function saveSubName() {
   }
   
   closeSubNameModal();
+  
+  // Auto-save form data when name is saved
+  if (typeof autoSaveFormData === 'function') {
+    autoSaveFormData();
+  }
 }
 
 /**
@@ -209,6 +219,11 @@ function saveWorkDescription() {
   }
   
   closeWorkDescModal();
+  
+  // Auto-save form data when description is saved
+  if (typeof autoSaveFormData === 'function') {
+    autoSaveFormData();
+  }
 }
 
 /**

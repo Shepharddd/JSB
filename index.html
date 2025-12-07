@@ -8,170 +8,203 @@
     <link rel="icon" href="assets/favicon.webp" type="image/webp">
   </head>
   <body>
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-      <div class="loading-spinner"></div>
-      <p class="loading-text">Loading...</p>
-    </div>
+    <div class="app-container">
+      <!-- Loading Overlay -->
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading...</p>
+      </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">
-      <span id="toastMessage">Form submitted successfully!</span>
-    </div>
+      <!-- Toast Notification -->
+      <div id="toast" class="toast">
+        <span id="toastMessage">Form submitted successfully!</span>
+      </div>
 
-    <div class="section">
-      <div class="two-col">
-        <img src="assets/JSBLogo.jpg" alt="JSB Logo" style="max-height: 150px; max-width: 50%; aspect-ratio: 4;" />
+      <div class="section">
+        <div class="two-col">
+          <img src="assets/JSBLogo.jpg" alt="JSB Logo" style="max-height: 150px; max-width: 50%; aspect-ratio: 4;" />
 
-        <div class="input-container">
-          <div class="input-row">
-            <label>Name:</label>
-            <select id="nameInput">
-              <option value="">Select name...</option>
-            </select>
+          <div class="input-container">
+            <div class="input-row">
+              <label>Name:</label>
+              <select id="nameInput">
+                <option value="">Select name...</option>
+              </select>
+            </div>
+    
+            <div class="input-row">
+              <label>Site:</label>
+              <select id="siteInput">
+                <option value="">Select site...</option>
+              </select>
+            </div>
+    
+            <div class="input-row">
+              <label>Weather:</label>
+              <input id="weatherInput" type="text" placeholder="Sunny · 29°C" />
+            </div>
+    
           </div>
-  
-          <div class="input-row">
-            <label>Site:</label>
-            <select id="siteInput">
-              <option value="">Select site...</option>
-            </select>
+        </div>
+
+        <div class="user-time-container">
+
+          <div class="date-navigation">
+            <button id="datePrevBtn" class="date-nav-btn" aria-label="Previous day">
+              <i data-lucide="chevron-left"></i>
+            </button>
+            <div id="dateDisplay" class="date-display"></div>
+            <input type="hidden" id="dateInput" />
+            <button id="dateNextBtn" class="date-nav-btn" aria-label="Next day">
+              <i data-lucide="chevron-right"></i>
+            </button>
           </div>
-  
-          <div class="input-row">
-            <label>Weather:</label>
-            <input id="weatherInput" type="text" placeholder="Sunny · 29°C" />
-          </div>
-  
-          <div class="input-row">
-            <!-- <label>Date:</label> -->
-            <div class="date-navigation">
-              <button id="datePrevBtn" class="date-nav-btn" aria-label="Previous day">
-                <i data-lucide="chevron-left"></i>
-              </button>
-              <div id="dateDisplay" class="date-display"></div>
-              <input type="hidden" id="dateInput" />
-              <button id="dateNextBtn" class="date-nav-btn" aria-label="Next day">
-                <i data-lucide="chevron-right"></i>
-              </button>
+
+          <div class="user-time-row">
+            <div class="user-time-row-item">
+              <label>Start:</label>
+              <div class="time-cell user-time-input" data-action="time" data-title="Start Time" id="userStartTimeCell">
+                <span class="time-display">07:00</span>
+                <input type="hidden" class="time-input" id="userStartTimeInput" value="07:00" />
+              </div>
+            </div>
+            <div class="user-time-row-item">
+              <label>End:</label>
+              <div class="time-cell user-time-input" data-action="time" data-title="End Time" id="userEndTimeCell">
+                <span class="time-display">15:30</span>
+                <input type="hidden" class="time-input" id="userEndTimeInput" value="15:30" />
+              </div>
             </div>
           </div>
+
+        </div>
+
+        <div class="notes-container">
+          <div class="notes-item">
+            <label for="tasksCompletedInput">Tasks Completed</label>
+            <textarea id="tasksCompletedInput" rows="5" placeholder="Describe the tasks completed today..."></textarea>
+          </div>
+          <div class="notes-item">
+            <label for="setbacksInput">Setbacks</label>
+            <textarea id="setbacksInput" rows="5" placeholder="Describe any setbacks or issues..."></textarea>
+          </div>
+          <div class="notes-item">
+            <label for="rfiInput">RFIs</label>
+            <textarea id="rfiInput" rows="5" placeholder="Enter any RFIs (Requests for Information)..."></textarea>
+          </div>
         </div>
       </div>
 
-      <div class="notes-container">
-        <textarea id="notesInput" rows="5" placeholder="Describe the works completed today..."></textarea>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <h2>Employees</h2>
-        <button id="addEmployeeBtn" class="add-btn">Add</button>
-      </div>
-      <table id="employeeTable">
-        <tr>
-          <th>Name</th>
-          <th>Start</th>
-          <th>Finish</th>
-          <th>Tasks</th>
-          <th></th>
-        </tr>
-      </table>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <h2>Subcontractors</h2>
-        <button id="addSubBtn" class="add-btn">Add</button>
-      </div>
-      <table id="subTable">
-        <tr>
-          <th>Name</th>
-          <th>Start</th>
-          <th>Finish</th>
-          <th>Tasks</th>
-          <th></th>
-        </tr>
-      </table>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <h2>Plant/Equipment</h2>
-        <button id="addPlantBtn" class="add-btn">Add</button>
-      </div>
-      <table id="plantTable">
-        <tr>
-          <th>Name</th>
-          <th>Tasks</th>
-          <th></th>
-        </tr>
-      </table>
-    </div>
-
-    <div class="section">
-      <button id="submitBtn" class="submit-btn">Submit</button>
-    </div>
-
-    <!-- Work Description Popup Modal -->
-    <div id="workDescModal" class="modal" style="display: none;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Work Description</h3>
-          <span class="modal-close" data-action="close-work-desc">&times;</span>
+      <div class="section">
+        <div class="section-header">
+          <h2>Employees</h2>
+          <button id="addEmployeeBtn" class="add-btn">Add</button>
         </div>
-        <div class="modal-body">
-          <textarea id="workDescTextarea" rows="6" placeholder="Enter work description..."></textarea>
+        <table id="employeeTable">
+          <tr>
+            <th>Name</th>
+            <th>Start</th>
+            <th>Finish</th>
+            <th>Tasks</th>
+            <th></th>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Subcontractors</h2>
+          <button id="addSubBtn" class="add-btn">Add</button>
         </div>
-        <div class="modal-footer">
-          <button class="modal-btn" data-action="save-work-desc">Save</button>
-          <button class="modal-btn modal-btn-cancel" data-action="close-work-desc">Cancel</button>
+        <table id="subTable">
+          <tr>
+            <th>Name</th>
+            <th>Start</th>
+            <th>Finish</th>
+            <th>Tasks</th>
+            <th></th>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Plant/Equipment</h2>
+          <button id="addPlantBtn" class="add-btn">Add</button>
+        </div>
+        <table id="plantTable">
+          <tr>
+            <th>Name</th>
+            <th>Tasks</th>
+            <th></th>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section">
+        <button id="submitBtn" class="submit-btn">Submit</button>
+      </div>
+
+      <!-- Work Description Popup Modal -->
+      <div id="workDescModal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Work Description</h3>
+            <span class="modal-close" data-action="close-work-desc">&times;</span>
+          </div>
+          <div class="modal-body">
+            <textarea id="workDescTextarea" rows="6" placeholder="Enter work description..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-btn" data-action="save-work-desc">Save</button>
+            <button class="modal-btn modal-btn-cancel" data-action="close-work-desc">Cancel</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Time Input Popup Modal -->
-    <div id="timeModal" class="modal" style="display: none;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="timeModalTitle">Time</h3>
-          <span class="modal-close" data-action="close-time">&times;</span>
-        </div>
-        <div class="modal-body">
-          <input type="time" id="timeInput" style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;" />
-        </div>
-        <div class="modal-footer">
-          <button class="modal-btn" data-action="save-time">Save</button>
-          <button class="modal-btn modal-btn-cancel" data-action="close-time">Cancel</button>
+      <!-- Time Input Popup Modal -->
+      <div id="timeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="timeModalTitle">Time</h3>
+            <span class="modal-close" data-action="close-time">&times;</span>
+          </div>
+          <div class="modal-body">
+            <input type="time" id="timeInput" style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;" />
+          </div>
+          <div class="modal-footer">
+            <button class="modal-btn" data-action="save-time">Save</button>
+            <button class="modal-btn modal-btn-cancel" data-action="close-time">Cancel</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Subcontractor Name Input Popup Modal -->
-    <div id="subNameModal" class="modal" style="display: none;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Subcontractor Name</h3>
-          <span class="modal-close" data-action="close-sub-name">&times;</span>
-        </div>
-        <div class="modal-body">
-          <input type="text" id="subNameInput" placeholder="Enter subcontractor name..." style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;" />
-        </div>
-        <div class="modal-footer">
-          <button class="modal-btn" data-action="save-sub-name">Save</button>
-          <button class="modal-btn modal-btn-cancel" data-action="close-sub-name">Cancel</button>
+      <!-- Subcontractor Name Input Popup Modal -->
+      <div id="subNameModal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Subcontractor Name</h3>
+            <span class="modal-close" data-action="close-sub-name">&times;</span>
+          </div>
+          <div class="modal-body">
+            <input type="text" id="subNameInput" placeholder="Enter subcontractor name..." style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px;" />
+          </div>
+          <div class="modal-footer">
+            <button class="modal-btn" data-action="save-sub-name">Save</button>
+            <button class="modal-btn modal-btn-cancel" data-action="close-sub-name">Cancel</button>
+          </div>
         </div>
       </div>
-    </div>
+  </div>
 
     <!-- Scripts - Load in order: config first, then dependencies, then app -->
     <script src="https://alcdn.msauth.net/browser/2.32.2/js/msal-browser.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="js/config.js"></script>
     <script src="js/ui-utils.js"></script>
-    <script src="js/date-navigation.js"></script>
     <script src="js/form-data.js"></script>
+    <script src="js/form-storage.js"></script>
+    <script src="js/date-navigation.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/graph-api.js"></script>
     <script src="js/weather-api.js"></script>

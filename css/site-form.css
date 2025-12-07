@@ -2,10 +2,17 @@
 /* Layout */
 body {
   font-family: Arial, sans-serif;
-  margin: 20px;
+  /* margin: 20px; */
   background: #f4f4f4;
   -webkit-tap-highlight-color: transparent;
 }
+
+.app-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -32,20 +39,91 @@ body {
   justify-content: space-between;
   height: 100%;
 }
+.user-time-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+  width: 100%;
+}
+.user-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 30px;
+  width: 50%;
+  padding: 10px 0;
+  flex-wrap: nowrap;
+}
+.user-time-row label {
+  white-space: nowrap;
+  font-weight: normal;
+}
+.user-time-row-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* justify-content: center; */
+  gap: 15px;
+}
+.user-time-input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  background-color: #fff;
+  min-width: 100px;
+  text-align: center;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.user-time-input:hover {
+  border-color: #999;
+  background-color: #f9f9f9;
+}
+.user-time-input .time-display {
+  min-width: auto;
+  text-align: center;
+  font-weight: 500;
+}
 .notes-container {
   display: flex;
+  flex-direction: row;
   gap: 20px;
   align-items: flex-start;
   margin-top: 20px;
   width: 100%;
 }
-.notes-container textarea {
+.notes-item {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  gap: 8px;
+}
+.notes-item label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}
+.notes-item textarea {
+  width: 100%;
+  min-height: 100px;
+  resize: none;
+  box-sizing: border-box;
+  margin: 0;
 }
 .notes-container .submit-btn {
   margin-top: 0;
   width: auto;
   align-self: flex-start;
+}
+@media (max-width: 768px) {
+  .notes-container {
+    flex-direction: column;
+  }
+  .notes-item {
+    width: 100%;
+  }
 }
 .input-row {
   width: 100%;
@@ -53,7 +131,7 @@ body {
   gap: 20px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid #e0e0e0;
   padding: 10px 0px;
 }
 .input-row input,
@@ -75,10 +153,10 @@ body {
 .date-navigation {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 12px;
-  width: 100%;
-  /* max-width: 250px; */
+  width: 50%;
+  flex-shrink: 0;
 }
 
 .date-nav-btn {
@@ -121,7 +199,8 @@ body {
 .date-display {
   flex: 1;
   text-align: center;
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: 500;
   color: #333;
   padding: 4px 8px;
   min-width: 150px;
@@ -134,7 +213,7 @@ body {
 .section-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 10px;
   width: 100%;
 }
@@ -157,7 +236,7 @@ body {
   }
   
   .date-display {
-    font-size: 12px;
+    font-size: 16px;
     min-width: 120px;
   }
   
@@ -402,9 +481,13 @@ input, textarea {
 }
 
 /* Responsive table improvements */
-@media (max-width: 768px) {
+@media (max-width: 1050px) {
+  .section-header {
+    margin-bottom: 0px;
+  }
   .section-header h2 {
-    font-size: 18px;
+    font-size: 24px;
+    margin-bottom: 0px;
   }
   .add-btn {
     font-size: 12px;
@@ -491,11 +574,56 @@ input, textarea {
     padding: 10px 8px;
     min-height: 32px;
   }
+
+  /* User time container on mobile - stack vertically if needed */
+  .user-time-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 15px;
+  }
+  
+  /* User time inputs on mobile - keep on one row */
+  .user-time-row {
+    flex-wrap: nowrap;
+    gap: 30px;
+    padding: 8px 0;
+    /* width: 100%; */
+  }
+  .user-time-row label {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .user-time-input {
+    min-width: 70px;
+    padding: 6px 8px;
+    flex-shrink: 1;
+  }
+  .user-time-input .time-display {
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 480px) {
+
+  .user-time-container {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 15px;
+    width: 100%;
+  }
+  .date-navigation {
+    width: 100%;
+  }
+  .user-time-row {
+    width: 100%;
+    justify-content: space-evenly;
+  }
   .section-header h2 {
-    font-size: 16px;
+    font-size: 20px;
+    margin-bottom: 0px;
   }
   .add-btn {
     font-size: 12px;
@@ -579,6 +707,22 @@ input, textarea {
   .sub-name-cell {
     padding: 8px 6px;
     min-height: 32px;
+  }
+
+  /* User time inputs on small mobile - keep compact and on one row */
+  .user-time-row {
+    gap: 6px;
+    padding: 6px 0;
+  }
+  .user-time-row label {
+    font-size: 12px;
+  }
+  .user-time-input {
+    min-width: 60px;
+    padding: 5px 6px;
+  }
+  .user-time-input .time-display {
+    font-size: 12px;
   }
 }
 

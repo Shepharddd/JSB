@@ -94,10 +94,40 @@ function collectPlantRows(date) {
  * Clears all form data except name, site, weather, and date
  */
 function clearFormData() {
-  // Clear notes
-  const notesInput = getElementById("notesInput");
-  if (notesInput) {
-    notesInput.value = "";
+  // Clear notes fields
+  const tasksCompletedInput = getElementById("tasksCompletedInput");
+  const setbacksInput = getElementById("setbacksInput");
+  const rfiInput = getElementById("rfiInput");
+  if (tasksCompletedInput) {
+    tasksCompletedInput.value = "";
+  }
+  if (setbacksInput) {
+    setbacksInput.value = "";
+  }
+  if (rfiInput) {
+    rfiInput.value = "";
+  }
+  
+  // Clear user time inputs
+  const userStartTimeInput = getElementById("userStartTimeInput");
+  const userEndTimeInput = getElementById("userEndTimeInput");
+  const userStartTimeDisplay = document.querySelector("#userStartTimeCell .time-display");
+  const userEndTimeDisplay = document.querySelector("#userEndTimeCell .time-display");
+  
+  const defaultStartTime = CONFIG.DEFAULTS.DEFAULT_TIME_IN;
+  const defaultEndTime = CONFIG.DEFAULTS.DEFAULT_TIME_OUT;
+  
+  if (userStartTimeInput) {
+    userStartTimeInput.value = defaultStartTime;
+  }
+  if (userEndTimeInput) {
+    userEndTimeInput.value = defaultEndTime;
+  }
+  if (userStartTimeDisplay) {
+    userStartTimeDisplay.textContent = defaultStartTime;
+  }
+  if (userEndTimeDisplay) {
+    userEndTimeDisplay.textContent = defaultEndTime;
   }
   
   // Clear employee rows (keep header row)
@@ -126,27 +156,22 @@ function clearTableRows(tableId) {
 
 /**
  * Validates the form data
- * @param {string} log - The notes/description text
+ * @param {string} tasksCompleted - Tasks completed text
+ * @param {string} setbacks - Setbacks text
+ * @param {string} rfi - RFI text
  * @param {Array} employeeRows - Array of employee rows
  * @returns {Object} Validation result with isValid flag and error message
  */
-function validateForm(log, employeeRows) {
-  const hasNotes = log.trim().length > 0;
-  const validEmployeeRows = employeeRows.filter(row => row.name && row.name.trim().length > 0);
-  console.log(validEmployeeRows)
-  const hasEmployees = validEmployeeRows.length > 0;
+function validateForm(tasksCompleted, setbacks, rfi, employeeRows) {
+  const hasTasksCompleted = tasksCompleted.trim().length > 0;
+  const hasSetbacks = setbacks.trim().length > 0;
+  const hasRfi = rfi.trim().length > 0;
+  const hasNotes = hasTasksCompleted || hasSetbacks || hasRfi;
 
   if (!hasNotes) {
     return {
       isValid: false,
       error: CONFIG.TOAST.ERROR_MESSAGES.NO_NOTES
-    };
-  }
-
-  if (!hasEmployees) {
-    return {
-      isValid: false,
-      error: CONFIG.TOAST.ERROR_MESSAGES.NO_EMPLOYEES
     };
   }
 
@@ -165,9 +190,13 @@ async function submitForm() {
     const siteInput = getElementById("siteInput");
     const weatherInput = getElementById("weatherInput");
     const dateInput = getElementById("dateInput");
-    const notesInput = getElementById("notesInput");
+    const tasksCompletedInput = getElementById("tasksCompletedInput");
+    const setbacksInput = getElementById("setbacksInput");
+    const rfiInput = getElementById("rfiInput");
+    const userStartTimeInput = getElementById("userStartTimeInput");
+    const userEndTimeInput = getElementById("userEndTimeInput");
 
-    if (!nameInput || !siteInput || !weatherInput || !dateInput || !notesInput) {
+    if (!nameInput || !siteInput || !weatherInput || !dateInput || !tasksCompletedInput || !setbacksInput || !rfiInput) {
       throw new Error("Required form elements not found");
     }
 
@@ -176,7 +205,11 @@ async function submitForm() {
     const weather = weatherInput.value || "";
     const dateValue = dateInput.value;
     const date = dateValue ? new Date(dateValue).getTime() / (1000 * 60 * 60 * 24) : "";
-    const log = notesInput.value || "";
+    const tasksCompleted = tasksCompletedInput.value || "";
+    const setbacks = setbacksInput.value || "";
+    const rfi = rfiInput.value || "";
+    const userStartTime = userStartTimeInput ? userStartTimeInput.value : "";
+    const userEndTime = userEndTimeInput ? userEndTimeInput.value : "";
 
     // Collect table data
     const employeeRows = collectEmployeeRows(date);
@@ -184,12 +217,15 @@ async function submitForm() {
     const plantRows = collectPlantRows(date);
 
     // Validate form
-    const validation = validateForm(log, employeeRows);
+    const validation = validateForm(tasksCompleted, setbacks, rfi, employeeRows);
     if (!validation.isValid) {
       showToast(validation.error, "error");
       setLoading(false);
       return;
     }
+
+    // Combine notes fields for backward compatibility with log field
+    const log = [tasksCompleted, setbacks, rfi].filter(n => n.trim()).join("\n\n");
 
     // Transform into a single JSON object
     const resultJSON = {
@@ -198,6 +234,11 @@ async function submitForm() {
         weather: weather,
         date: date,
         log: log,
+        tasksCompleted: tasksCompleted,
+        setbacks: setbacks,
+        rfi: rfi,
+        startTime: userStartTime ? timeToExcelFraction(userStartTime) : "",
+        endTime: userEndTime ? timeToExcelFraction(userEndTime) : "",
         employees: employeeRows,
         subcontractors: subRows,
         plants: plantRows
@@ -218,7 +259,13 @@ async function submitForm() {
     // Submit form
     await postForm(resultJSONString, token.accessToken);
     
-    // Clear form after successful submission
+    // Save form data to localStorage before clearing
+    const currentDateString = dateValue;
+    if (currentDateString) {
+      saveFormData(currentDateString);
+    }
+    
+    // Clear form after successful submission (but keep saved data)
     clearFormData();
     
     // Show success toast

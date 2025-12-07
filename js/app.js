@@ -20,6 +20,11 @@ async function init() {
     const flowToken = await getAuth();
     setToken(flowToken);
 
+    // Clear all timesheet data from localStorage when fetching fresh data
+    if (typeof clearAllTimesheetData === 'function') {
+      clearAllTimesheetData();
+    }
+    
     // Load company data
     const [users, plant, sites, admins] = await getCompanyData(flowToken);
     
@@ -70,6 +75,11 @@ function initializeApp() {
   
   // Initialize date navigation
   initDateNavigation();
+  
+  // Initialize auto-save
+  if (typeof initAutoSave === 'function') {
+    initAutoSave();
+  }
   
   // Initialize application
   init();

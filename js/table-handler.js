@@ -47,6 +47,11 @@ function addEmployeeRow() {
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
+  
+  // Auto-save form data when row is added
+  if (typeof autoSaveFormData === 'function') {
+    autoSaveFormData();
+  }
 }
 
 /**
@@ -84,6 +89,11 @@ function addSubRow() {
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
+  
+  // Auto-save form data when row is added
+  if (typeof autoSaveFormData === 'function') {
+    autoSaveFormData();
+  }
 }
 
 /**
@@ -117,6 +127,11 @@ function addPlantRow() {
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
+  
+  // Auto-save form data when row is added
+  if (typeof autoSaveFormData === 'function') {
+    autoSaveFormData();
+  }
 }
 
 /**
@@ -127,6 +142,11 @@ function deleteRow(button) {
   const row = button.closest("tr");
   if (row) {
     row.remove();
+    
+    // Auto-save form data when row is deleted
+    if (typeof autoSaveFormData === 'function') {
+      autoSaveFormData();
+    }
   }
 }
 
