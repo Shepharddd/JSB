@@ -220,6 +220,7 @@ body {
 .section-header h2 {
   margin-top: 0;
   padding-top: 0;
+  margin-bottom: 0;
 }
 
 @media (max-width: 800px) {
